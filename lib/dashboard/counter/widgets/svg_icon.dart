@@ -44,7 +44,7 @@ class _SvgIconState extends State<SvgIcon> {
             '${config.ICON_ROOT}${widget.path}',
             color: widget.color,
           )
-        : SvgPicture.network(
+        : SvgPicture.asset(
             'assets/icons/${widget.path}',
             color: widget.color,
           );

@@ -5,6 +5,8 @@ import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart'
 import 'package:zts_counter_desktop/dashboard/counter/counter_dash.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
+import 'package:zts_counter_desktop/dashboard/counter/data/repository/ticket_bloc.dart';
+import 'package:zts_counter_desktop/dashboard/counter/widgets/generated_ticket_card.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/tab_bar_selector.dart';
 
 import 'package:zts_counter_desktop/main.dart';
@@ -21,7 +23,10 @@ class _DashBoardWrapperState extends State<DashBoardWrapper> {
   Widget build(BuildContext context) {
     return CategoryProvider(
       context: context,
-      child: Dashboard(),
+      child: TicketProvider(
+        context: context,
+        child: Dashboard(),
+      ),
     );
   }
 }
@@ -45,47 +50,68 @@ class _DashboardState extends State<Dashboard> {
           if (snapshot.hasData) {
             Future.delayed(Duration(milliseconds: 50)).then((value) {
               if (snapshot.data == false) {
-                 Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushReplacementNamed(context, '/login');
                 // !sharedPref.loggedIn ? Navigator.pushReplacementNamed(context, '/login') : null;
               }
             });
           }
-
           return WinScaffold(
               child: Scaffold(
                   backgroundColor: Colors.white,
-                  body: Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Container(
-                          child: topBar(),
-                        ),
-                        Row(
+                  body: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(0),
+                        child: Column(
                           children: [
-                            StreamBuilder<List<CategoryModel>>(
-                                stream: categoryBloc.categoryListStream,
-                                builder: (context, snapshot) {
-                                  return CounterDash(
-                                    categoryList: snapshot.data ?? [],
-                                  );
-                                }),
+                            Container(
+                              child: topBar(),
+                            ),
+                            Row(
+                              children: [
+                                StreamBuilder<List<CategoryModel>>(
+                                    stream: categoryBloc.categoryListStream,
+                                    builder: (context, snapshot) {
+                                      return CounterDash(
+                                        categoryList: snapshot.data ?? [],
+                                      );
+                                    }),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                     
+                    ],
                   )));
         });
   }
 
   Widget topBar() {
-    return Row(
-      children: const [
-        TabBarSelector(
-          title: 'Counter',
-          width: 130,
+    return Container(
+      height: 80,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TabBarSelector(
+              title: 'Counter',
+              width: 130,
+              ontap: () {},
+              selected: true,
+            ),
+            TabBarSelector(
+              title: 'Logout',
+              width: 130,
+              selected: false,
+              ontap: () {
+                CheckLoginProvider.of(context)?.logout();
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

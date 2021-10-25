@@ -27,7 +27,7 @@ class _CategoryCardState extends State<CategoryCard> {
     CategoryBloc categoryBloc = CategoryProvider.of(context);
     return Container(
       width: 100,
-      height: 200,
+      height: 250,
       decoration: BoxDecoration(
         color: Colors.transparent,
         boxShadow: [
@@ -55,7 +55,7 @@ class _CategoryCardState extends State<CategoryCard> {
           splashColor: widget.color..withOpacity(0.5),
           highlightColor: widget.color.withOpacity(0.2),
           child: Container(
-            height: 200,
+            height: 250,
             width: 180,
             decoration: BoxDecoration(
               border: Border.all(color: widget.color, width: 2),
@@ -76,12 +76,15 @@ class _CategoryCardState extends State<CategoryCard> {
                     )
                   ],
                 ),
+                SizedBox(
+                  height: 10,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
                         width: MediaQuery.of(context).size.width * 0.08,
-                        height: MediaQuery.of(context).size.height * 0.1,
+                        height: MediaQuery.of(context).size.height * 0.09,
                         child: SvgIcon(
                           color: widget.active ? Colors.white : widget.color,
                           path: '${widget.categoryModel.name}.svg',
@@ -95,12 +98,11 @@ class _CategoryCardState extends State<CategoryCard> {
                       widget.categoryModel.categoryQyantity == 0
                           ? ""
                           : widget.categoryModel.categoryQyantity.toString(),
-                          style: TextStyle(
-                            color: widget.active ? Colors.white : widget.color,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: appFonts.varelaRound
-                          ),
+                      style: TextStyle(
+                          color: widget.active ? Colors.white : widget.color,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: appFonts.varelaRound),
                     ),
                   ],
                 )

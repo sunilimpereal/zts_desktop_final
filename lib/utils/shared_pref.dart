@@ -4,16 +4,18 @@ class SharedPref {
   static SharedPreferences? _sharedPref;
   init() async {
     if (_sharedPref == null) {
-      _sharedPref = await  SharedPreferences.getInstance();
+      _sharedPref = await SharedPreferences.getInstance();
     }
   }
 
   //gettter
   bool get loggedIn => _sharedPref!.getBool('loggedIn') ?? false;
   String get loginId => _sharedPref!.getString('loginId') ?? "";
+  String get userEmail => _sharedPref!.getString('userEmail') ?? "";
+  String get organizationName => _sharedPref!.getString('organizationName') ?? "";
+  String get organizationLogo => _sharedPref!.getString('organizationLogo') ?? "";
+
   String? get token => _sharedPref!.getString('authToken');
-
-
 
   ///Set as logged in
   setLoggedIn() {
@@ -27,15 +29,22 @@ class SharedPref {
   }
 
   /// Set uuid for the user
-  setLoginId({required String loginId}) {
+  setUserDetails({
+    required String loginId,
+    required String userEmail,
+    required String organizationName,
+    required String organizationLogo,
+  }) {
     _sharedPref!.setString('loginId', loginId);
+    _sharedPref!.setString('userEmail', userEmail);
+    _sharedPref!.setString('organizationName', organizationName);
+    _sharedPref!.setString('organizationLogo', organizationLogo);
   }
 
   ///set Auth token for the app
   setAuthToken({required String token}) {
     _sharedPref!.setString('authToken', token);
   }
-
 }
 
 final sharedPrefs = SharedPref();

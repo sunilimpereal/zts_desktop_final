@@ -3,10 +3,14 @@ import 'package:flutter/material.dart';
 class TabBarSelector extends StatefulWidget {
   final String title;
   final double width;
-  const TabBarSelector({
+  Function ontap;
+  bool selected;
+   TabBarSelector({
     Key? key,
     required this.title,
     required this.width,
+    required this.ontap,
+    required this.selected
   }) : super(key: key);
 
   @override
@@ -19,10 +23,14 @@ class _TabBarSelectorState extends State<TabBarSelector> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Material(
+        color: Colors.white,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            widget.ontap();
+          },
           child: SizedBox(
             width: widget.width,
+            height: 45,
             child: Column(
               children: [
                 Text(
@@ -32,7 +40,7 @@ class _TabBarSelectorState extends State<TabBarSelector> {
                 const SizedBox(
                   height: 8,
                 ),
-                Container(
+               widget.selected? Container(
                   height: 4,
                   width: widget.width,
                   decoration: BoxDecoration(
@@ -43,7 +51,7 @@ class _TabBarSelectorState extends State<TabBarSelector> {
                     ),
                     color: Theme.of(context).primaryColor,
                   ),
-                )
+                ):Container()
               ],
             ),
           ),

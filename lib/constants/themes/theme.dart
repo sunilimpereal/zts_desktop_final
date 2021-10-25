@@ -29,7 +29,7 @@ ThemeData get theme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: OutlinedButton.styleFrom(
             primary: const Color(0xFFFFFFFF),
-            backgroundColor: const Color(0xFF048998),
+            backgroundColor: primary,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
             padding: EdgeInsets.all(8),
             visualDensity: const VisualDensity(

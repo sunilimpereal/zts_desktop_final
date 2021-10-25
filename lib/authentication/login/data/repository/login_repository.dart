@@ -6,16 +6,26 @@ import 'package:zts_counter_desktop/authentication/login/data/models/login_reque
 import 'package:zts_counter_desktop/authentication/login/data/models/login_respose_model.dart';
 import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/repository/repositry.dart';
+import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 class LoginRepository {
-  Future<bool> login({required BuildContext context,required String email, required String password}) async {
+  Future<bool> login(
+      {required BuildContext context, required String email, required String password}) async {
     try {
+          Map<String, String>? postheaders = {
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ${sharedPref.token}',
+  };
       LoginRequest loginRequest = LoginRequest(email: email, password: password);
-      final response = await API.post(url: 'login/', body: loginRequest.toJson());
+      final response = await API.post(url: 'login/', body: loginRequest.toJson(), context: context,headers: postheaders);
       if (response.statusCode == 200) {
         LoginResponse loginResponse = loginResponseFromJson(response.body);
-
-        sharedPref.setLoginId(loginId: loginResponse.loginId.toString());
+        sharedPrefs.setUserDetails(
+          loginId: loginResponse.loginId.toString(),
+          userEmail: email,
+          organizationName: loginResponse.organizationName,
+          organizationLogo: loginResponse.organizationLogo,
+        );
         sharedPref.setLoggedIn();
         sharedPref.setAuthToken(token: loginResponse.token);
         CheckLoginProvider.of(context)?.login();

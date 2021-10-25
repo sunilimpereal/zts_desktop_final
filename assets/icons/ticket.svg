@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="79.1" height="67" viewBox="0 0 79.1 67">
+  <g id="ticket" transform="translate(-10.5 -12)">
+    <g id="Group_36" data-name="Group 36">
+      <rect id="Rectangle_25" data-name="Rectangle 25" width="21.3" height="2" transform="translate(42.5 71.6)"/>
+      <rect id="Rectangle_26" data-name="Rectangle 26" width="21.3" height="2" transform="translate(42.5 63)"/>
+      <path id="Path_57" data-name="Path 57" d="M89.6,43.1,84.7,30.3l-.9.4a2.944,2.944,0,0,1-2.1-5.5l.9-.4L77.7,12,32.2,29.3l.4.9A2.734,2.734,0,0,1,31,33.8a2.855,2.855,0,0,1-3.6-1.6l-.4-.9L10.5,37.6,14,47V59.3h1a3.009,3.009,0,0,1,3,3,2.946,2.946,0,0,1-3,3H14V79H31.6V78a2.8,2.8,0,0,1,2.8-2.8A2.862,2.862,0,0,1,37.2,78v1H86V65.2H85a3.009,3.009,0,0,1-3-3,2.946,2.946,0,0,1,3-3h1V45.6H82.8ZM34.7,30.5l41.9-16,3.5,9.1a4.9,4.9,0,0,0,3.4,9L87,41.7l-41.9,16a4.748,4.748,0,0,0-4.8-2.1L32.5,35.2A4.587,4.587,0,0,0,34.7,30.5ZM13,38.8l9-3.4L32.4,62.7l-9,3.4L20,57a5.034,5.034,0,0,0,2-5.9A4.931,4.931,0,0,0,16.6,48Zm3,18.6V50.1l.2-.1a2.944,2.944,0,0,1,2.1,5.5l-.9.4,1.1,2.8A5.455,5.455,0,0,0,16,57.4Zm9.7,19.5H16V67.1a4.813,4.813,0,0,0,3.9-4.6l2.3,6.2,3.4-1.3v9.5Zm7.7-3.7a4.835,4.835,0,0,0-3.7,3.7H27.6V66.6l5.8-2.2ZM34.3,62,23.9,34.6l1.9-.7A4.748,4.748,0,0,0,30.6,36l7.8,20.4a5,5,0,0,0-2.2,4.8ZM84,47.6v9.8a5,5,0,0,0,0,9.8V77H39.2a4.835,4.835,0,0,0-3.7-3.7V63.8l3.3-1.3-.4-.9A2.734,2.734,0,0,1,40,58a2.916,2.916,0,0,1,3.5,1.3h-1v2H73.3v-2H47.4l5-1.9H73.3v-2H57.6l5-1.9H73.3v-2H67.8l9.7-3.7H84Z"/>
+      <rect id="Rectangle_27" data-name="Rectangle 27" width="30.8" height="2" transform="translate(39.164 32.832) rotate(-20.849)"/>
+      <rect id="Rectangle_28" data-name="Rectangle 28" width="30.8" height="2" transform="translate(71.436 30.997) rotate(159.151)"/>
+      <rect id="Rectangle_29" data-name="Rectangle 29" width="2" height="21.3" transform="translate(47.024 53.599) rotate(-110.844)"/>
+      <rect id="Rectangle_30" data-name="Rectangle 30" width="30.8" height="2" transform="translate(70.056 27.325) rotate(159.151)"/>
+      <rect id="Rectangle_31" data-name="Rectangle 31" width="21.3" height="2" transform="translate(43.257 43.759) rotate(-20.849)"/>
+    </g>
+  </g>
+</svg>
