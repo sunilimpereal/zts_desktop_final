@@ -26,6 +26,8 @@ class CategoryModel {
   List<Subcategory> subcategories;
   DateTime createdTs;
   DateTime modifiedTs;
+  int categoryPrice = 0;
+  int categoryQyantity = 0;
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         id: json['id'],
@@ -65,6 +67,8 @@ class Subcategory {
   int category;
   DateTime createdTs;
   DateTime modifiedTs;
+  int subCategoryTotalPrice =0;
+  int quantity=0;
 
   factory Subcategory.fromJson(Map<String, dynamic> json) => Subcategory(
         id: json['id'],

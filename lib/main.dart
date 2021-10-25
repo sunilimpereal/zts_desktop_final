@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_bloc.dart';
+import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
 import 'package:zts_counter_desktop/authentication/login/login_page.dart';
 
 // database
@@ -58,14 +59,20 @@ class AppWrapperProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LoginProvider(
-      child: MyApp(),
+    return CheckLoginProvider(
+      child: LoginProvider(
+        child: MyApp(),
+      ),
     );
   }
 }
 
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  static void setLocale(BuildContext context, Locale locale) {
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state?.logout();
+  }
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -77,13 +84,17 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
+  logout() {
+    Navigator.pushNamed(context, '/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: theme,
       title: 'ZTS Counter',
-      initialRoute: sharedPref.loggedIn ? '/dashboard' : '/login',
+      initialRoute: sharedPrefs.loggedIn ? '/dashboard' : '/login',
       onGenerateRoute: onGeneratedRoute,
     );
   }

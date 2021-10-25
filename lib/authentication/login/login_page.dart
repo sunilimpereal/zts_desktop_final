@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                   loginRepository
                       .login(
                     email: emailController.text,
-                    password: passwordController.text,
+                    password: passwordController.text, context: context,
                   )
                       .then((value) {
                     if (value) Navigator.pushReplacementNamed(context, '/dashboard');

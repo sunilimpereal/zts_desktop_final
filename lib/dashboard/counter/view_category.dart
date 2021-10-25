@@ -4,7 +4,8 @@ import 'package:zts_counter_desktop/dashboard/counter/widgets/sub_category_card.
 
 class ViewCategory extends StatefulWidget {
   CategoryModel category;
-  ViewCategory({Key? key, required this.category}) : super(key: key);
+  Color? color;
+  ViewCategory({Key? key, required this.category, this.color = Colors.green}) : super(key: key);
 
   @override
   _ViewCategoryState createState() => _ViewCategoryState();
@@ -14,24 +15,41 @@ class _ViewCategoryState extends State<ViewCategory> {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        // width: MediaQuery.of(context).size.width*0.6,
-        // color: Colors.red,
-        child: Container(
-            height: MediaQuery.of(context).size.height - 80,
-            padding: const EdgeInsets.all(8),
-            color: Colors.red,
-            child: Row(
+      // width: MediaQuery.of(context).size.width*0.6,
+      // color: Colors.red,
+      child: Container(
+        height: MediaQuery.of(context).size.height - 80,
+        padding: const EdgeInsets.all(8),
+        color: widget.color?.withOpacity(0.1),
+        child: Row(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  children: [
-                    Text(widget.category.name),
-                    Column(
-                        children: widget.category.subcategories.map((e) {
-                      return SubCategoryCard(subcategory: e);
-                    }).toList())
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    widget.category.name,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: widget.color,
+                    ),
+                  ),
                 ),
+                Column(
+                    children: widget.category.subcategories.map((e) {
+                  return SubCategoryCard(
+                    subcategory: e,
+                    parentCategory: widget.category,
+                    color: widget.color,
+                  );
+                }).toList())
               ],
-            )));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

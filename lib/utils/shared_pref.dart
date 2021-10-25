@@ -23,6 +23,7 @@ class SharedPref {
   /// Set as logged out
   setLoggedOut() {
     _sharedPref!.setBool('loggedIn', false);
+    // _sharedPref!.remove('authToken');
   }
 
   /// Set uuid for the user

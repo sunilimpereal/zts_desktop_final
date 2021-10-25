@@ -22,15 +22,6 @@ class LoginBloc with ValidationMixin {
           password,
         ],
       );
-  //submit button
-  Future<bool> submit() async {
-    LoginRepository loginRepository = LoginRepository();
-    bool result = await loginRepository.login(
-      email: _email.value,
-      password: _password.value,
-    );
-    return result;
-  }
 
   dispose() {
     _email.close();

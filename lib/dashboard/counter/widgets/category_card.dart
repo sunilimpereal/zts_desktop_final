@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/svg_icon.dart';
@@ -89,7 +88,22 @@ class _CategoryCardState extends State<CategoryCard> {
                         ))
                   ],
                 ),
-                const SizedBox()
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      widget.categoryModel.categoryQyantity == 0
+                          ? ""
+                          : widget.categoryModel.categoryQyantity.toString(),
+                          style: TextStyle(
+                            color: widget.active ? Colors.white : widget.color,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: appFonts.varelaRound
+                          ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
