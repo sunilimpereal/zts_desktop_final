@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
-import 'package:zts_counter_desktop/dashboard/counter/data/models/ticket.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/sub_category_card.dart';
 import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/repository/repositry.dart';

@@ -49,8 +49,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget logincard(LoginBloc? loginBloc) {
     return Container(
-      height: 580,
-      width: 450,
+      height: 550,
+      width: 400,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(
@@ -79,11 +79,11 @@ class _LoginPageState extends State<LoginPage> {
           Column(
             children: [
               ZTSTextField(
-                width: 350,
+                width: 300,
                 controller: emailController,
                 focusNode: emailFocus,
                 icon: Icons.email,
-                labelText: 'Username/Email',
+                labelText: 'Email',
                 onChanged: loginBloc!.changeEmail,
                 onfocus: emailFocus.hasFocus,
                 onTap: ontap,
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                 heading: 'Email',
               ),
               ZTSTextField(
-                width: 350,
+                width: 300,
                 controller: passwordController,
                 focusNode: passwordFocus,
                 icon: Icons.email,
@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                 onfocus: passwordFocus.hasFocus,
                 onTap: ontap,
                 stream: loginBloc.password,
+                obscureText: true,
                 heading: 'Password',
               ),
             ],
@@ -115,12 +116,15 @@ class _LoginPageState extends State<LoginPage> {
                   loginRepository
                       .login(
                     email: emailController.text,
-                    password: passwordController.text, context: context,
+                    password: passwordController.text,
+                    context: context,
                   )
                       .then((value) {
-                    if (value) Navigator.pushReplacementNamed(context, '/dashboard');
-                    setState(() {
-                      loginFailFlag = !value;
+                    Future.delayed(const Duration(milliseconds: 100)).then((value1) {
+                      if (value) Navigator.pushReplacementNamed(context, '/dashboard');
+                      setState(() {
+                        loginFailFlag = !value;
+                      });
                     });
                   });
                 },

@@ -61,7 +61,7 @@ class _ZTSStreamButtonState extends State<ZTSStreamButton> {
                             onPressed: snapshot.hasError || !snapshot.hasData
                                 ? () {
                                     setState(() {
-                                      error = 'Fill all Fields to save';
+                                      error = 'Fill all Fields to Login';
                                     });
                                   }
                                 : () {
@@ -93,7 +93,7 @@ class _ZTSStreamButtonState extends State<ZTSStreamButton> {
                               ],
                             )
                           : Container(),
-                      widget.errorFlag
+                      widget.errorFlag && error == ""
                           ? Row(
                               children: [
                                 Icon(

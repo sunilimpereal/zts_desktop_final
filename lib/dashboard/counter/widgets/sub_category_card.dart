@@ -65,22 +65,26 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
           child: InkWell(
             child: Container(
               padding: const EdgeInsets.all(8),
-              width: 600,
+              width: MediaQuery.of(context).size.width*0.36,
               height: 80,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(widget.subcategory.name + " " + widget.subcategory.type,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headline6
-                              ?.copyWith(color: widget.color)),
-                      Text('₹ ${widget.subcategory.price.toString()}')
-                    ],
+                  Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                          widget.subcategory.name + " " + widget.subcategory.type,
+                            textScaleFactor: 1,
+                            style: Theme.of(context)
+                                .textTheme
+                                .headline6
+                                ?.copyWith(color: widget.color)),
+                        Text('₹ ${widget.subcategory.price.toString()}')
+                      ],
+                    ),
                   ),
                   quantity()
                 ],

@@ -12,7 +12,7 @@ class ValidationMixin {
   });
   final validatorPassword =
       StreamTransformer<String, String>.fromHandlers(handleData: (password, sink1) {
-    if (password.length < 5) {
+    if (password.length < 1) {
       sink1.addError('Please Enter Valid password');
     } else {
       sink1.add(password);

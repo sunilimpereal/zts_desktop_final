@@ -25,6 +25,9 @@ class ZTSTextField extends StatefulWidget {
 
   ///heding on the textfield
   String heading;
+
+  bool obscureText;
+
   ZTSTextField({
     Key? key,
     required this.onfocus,
@@ -38,6 +41,7 @@ class ZTSTextField extends StatefulWidget {
     required this.stream,
     required this.width,
     required this.heading,
+    this.obscureText = false,
   }) : super(key: key);
 
   @override
@@ -89,6 +93,7 @@ class _ZTSTextFieldState extends State<ZTSTextField> {
                             controller: widget.controller,
                             focusNode: widget.focusNode,
                             textAlign: TextAlign.left,
+                            obscureText: widget.obscureText,
                             style: TextStyle(
                               fontSize: 16,
                               color: Theme.of(context).textTheme.headline1!.color,
@@ -136,7 +141,7 @@ class _ZTSTextFieldState extends State<ZTSTextField> {
                                     style: TextStyle(
                                         color: Theme.of(context).errorColor,
                                         fontWeight: FontWeight.w600,
-                                        fontSize: 13),
+                                        fontSize: 12),
                                   )
                                 : Container(),
                           ],

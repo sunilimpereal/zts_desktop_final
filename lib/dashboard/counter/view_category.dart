@@ -17,7 +17,7 @@ class _ViewCategoryState extends State<ViewCategory> {
     return Expanded(
       child: Container(
         height: MediaQuery.of(context).size.height - 80,
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           gradient: LinearGradient(
               end: Alignment.topCenter,

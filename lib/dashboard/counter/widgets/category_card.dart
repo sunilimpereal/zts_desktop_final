@@ -26,8 +26,7 @@ class _CategoryCardState extends State<CategoryCard> {
   Widget build(BuildContext context) {
     CategoryBloc categoryBloc = CategoryProvider.of(context);
     return Container(
-      width: 100,
-      height: 250,
+     
       decoration: BoxDecoration(
         color: Colors.transparent,
         boxShadow: [
@@ -61,7 +60,7 @@ class _CategoryCardState extends State<CategoryCard> {
               border: Border.all(color: widget.color, width: 2),
               borderRadius: BorderRadius.circular(8),
             ),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -83,8 +82,8 @@ class _CategoryCardState extends State<CategoryCard> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.08,
-                        height: MediaQuery.of(context).size.height * 0.09,
+                        width: MediaQuery.of(context).size.width * 0.07,
+                        height: MediaQuery.of(context).size.height * 0.07,
                         child: SvgIcon(
                           color: widget.active ? Colors.white : widget.color,
                           path: '${widget.categoryModel.name}.svg',

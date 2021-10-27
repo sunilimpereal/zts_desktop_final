@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/generated_tickets.dart';
-import 'package:zts_counter_desktop/dashboard/counter/data/repository/ticket_bloc.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 
 class TicketDisplay extends StatefulWidget {
   const TicketDisplay({Key? key}) : super(key: key);
@@ -35,7 +35,7 @@ class TicketCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical:4.0,horizontal: 8),
       child: Material(
         elevation: 8,
         shadowColor: Colors.grey[50],
@@ -46,22 +46,22 @@ class TicketCard extends StatelessWidget {
           child: Stack(
             children: [
               Container(
-                width: 300,
-                height: 100,
+                width: 250,
+                height: 68,
                 color: Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(4.0),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     Container(
-                      width: 80,
-                      height: 60,
+                      width: 48,
+                      height: 48,
                       child: SvgPicture.asset(
                         'assets/icons/ticket.svg',
                         color: Colors.green,
                       ),
                     ),
                     const SizedBox(
-                      width: 10,
+                      width: 8,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,14 +69,14 @@ class TicketCard extends StatelessWidget {
                       children: [
                         Text(
                           generatedTicket.number,
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 8,
                         ),
                         Text(
                           '₹ ${generatedTicket.price.toString()}',
-                          style: const TextStyle(fontWeight: FontWeight.w500),
+                          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                         )
                       ],
                     )
@@ -89,7 +89,10 @@ class TicketCard extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
                     // child: Text(DateFormat().format(generatedTicket.issuedTs).toString()),
-                    child: Text(DateFormat('h:mm a').format(generatedTicket.issuedTs).toString()),
+                    child: Text(
+                      DateFormat('h:mm a').format(generatedTicket.issuedTs).toString(),
+                      style: TextStyle(fontSize: 14),
+                    ),
                   ))
             ],
           ),

@@ -91,10 +91,10 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,  
       theme: theme,
       title: 'ZTS Counter',
-      initialRoute: sharedPrefs.loggedIn ? '/dashboard' : '/login',
+      initialRoute: '/login',
       onGenerateRoute: onGeneratedRoute,
     );
   }

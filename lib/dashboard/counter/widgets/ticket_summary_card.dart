@@ -1,13 +1,15 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
-import 'package:zts_counter_desktop/dashboard/counter/data/models/ticket.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
-import 'package:zts_counter_desktop/dashboard/counter/data/repository/ticket_bloc.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 import 'package:zts_counter_desktop/main.dart';
+import 'package:zts_counter_desktop/printer/bill_pdf.dart';
 
 class TicketSummaryCard extends StatefulWidget {
   const TicketSummaryCard({Key? key}) : super(key: key);
@@ -28,9 +30,9 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
         borderRadius: const BorderRadius.all(Radius.circular(16)),
         clipBehavior: Clip.hardEdge,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.9,
+          height: MediaQuery.of(context).size.height * 0.88,
           padding: const EdgeInsets.all(8),
-          width: 470,
+          width: MediaQuery.of(context).size.width * 0.25,
           child: Stack(
             // mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -61,7 +63,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                 bottom: 0,
                 child: Container(
                   height: 150,
-                  width: 450,
+                  width: MediaQuery.of(context).size.width * 0.24,
                   color: Colors.white.withOpacity(0.9),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -76,7 +78,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                               'TOTAL',
                               style: TextStyle(
                                 color: Theme.of(context).primaryColor,
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -87,7 +89,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                                     '₹ ${getTotalCategory(snapshot.data ?? [])} /- ',
                                     style: TextStyle(
                                       color: Theme.of(context).primaryColor,
-                                      fontSize: 28,
+                                      fontSize: 24,
                                       fontFamily: appFonts.notoSans,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -100,8 +102,8 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           SizedBox(
-                            width: 80,
-                            height: 55,
+                            width: 60,
+                            height: 48,
                             child: ElevatedButton(
                               onPressed: () {
                                 CategoryProvider.of(context).getCategoryList();
@@ -113,21 +115,32 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                               stream: CategoryProvider.of(context).categoryListStream,
                               builder: (context, snapshot) {
                                 return SizedBox(
-                                  width: 250,
-                                  height: 55,
+                                  width: 200,
+                                  height: 48,
                                   child: ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       if (!(getTotalCategory(snapshot.data ?? []) == 0)) {
                                         CategoryRepository categoryRepository =
                                             CategoryRepository();
-                                        categoryRepository.generateTicket(
-                                            context: context, list: snapshot.data ?? []).then((value) {
-                                              log('returned data $value');
-                                              if(value){
-                                                CategoryProvider.of(context).getCategoryList();
-                                                TicketProvider.of(context).getRecentTickets();
-                                              }
-                                            });
+
+                                        final pdfFile = await PdfApi.zooBill();
+                                        final pdf = pdfFile.readAsBytes();
+
+                                        await Printing.layoutPdf(onLayout: (_) => pdf);
+                                        PdfApi.openFile(pdfFile);
+
+                                        // categoryRepository
+                                        //     .generateTicket(
+                                        //         context: context, list: snapshot.data ?? [])
+                                        //     .then((value) async {
+
+                                        //   log('returned data $value');
+                                        //   if (value) {
+
+                                        //     CategoryProvider.of(context).getCategoryList();
+                                        //     TicketProvider.of(context).getRecentTickets();
+                                        //   }
+                                        // });
                                       }
                                     },
                                     child: const Text(
@@ -172,7 +185,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
           if (!snapshot.hasData) return Container();
           List<CategoryModel> categoryList = snapshot.data!;
           return Container(
-            height: MediaQuery.of(context).size.height * 0.78,
+            height: MediaQuery.of(context).size.height * 0.72,
             child: SingleChildScrollView(
               child: Container(
                   child: Column(
@@ -221,7 +234,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                       list[i].name,
                       style: TextStyle(
                           color: Theme.of(context).primaryColor,
-                          fontSize: 22,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold),
                     )
                   ],
@@ -239,7 +252,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
   }
 }
 
-class TableRowHeading extends StatelessWidget {
+class TableRowHeading extends StatefulWidget {
   bool heading;
   String? title;
   TableRowHeading({
@@ -249,17 +262,22 @@ class TableRowHeading extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TableRowHeading> createState() => _TableRowHeadingState();
+}
+
+class _TableRowHeadingState extends State<TableRowHeading> {
+  @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
-      color: heading ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.transparent,
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+      color: widget.heading ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.transparent,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           cell(4, 'Name'),
-          cell(2, 'Per Ticket'),
-          cell(1, 'QTY'),
-          cell(1.5, 'Total'),
+          cell(2.12, 'Per Ticket'),
+          cell(1.1, 'QTY'),
+          cell(2, 'Total'),
         ],
       ),
     );
@@ -267,17 +285,23 @@ class TableRowHeading extends StatelessWidget {
 
   Widget cell(double width, String text) {
     return Container(
-      width: 50 * width,
+      width: MediaQuery.of(context).size.width * 0.024 * width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              text,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+            Container(
+               width: MediaQuery.of(context).size.width * 0.024 * width-8,
+              child: Text(
+                text,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  
+                  fontSize: 12,
+                ),
               ),
             ),
           ],
@@ -294,7 +318,7 @@ class TableRowHeading extends StatelessWidget {
   }
 }
 
-class TableRowData extends StatelessWidget {
+class TableRowData extends StatefulWidget {
   final String name;
   final String perTicket;
   final int qty;
@@ -310,18 +334,23 @@ class TableRowData extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TableRowData> createState() => _TableRowDataState();
+}
+
+class _TableRowDataState extends State<TableRowData> {
+  @override
   Widget build(BuildContext context) {
-    double width = 50;
+    double width = MediaQuery.of(context).size.width * 0.024;
     return Container(
-      color: even ? const Color(0xffE3F1E3).withOpacity(0.3) : Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
+      color: widget.even ? const Color(0xffE3F1E3).withOpacity(0.3) : Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          cell(4, '$name'),
-          cell(2, '$perTicket'),
-          cell(1, '$qty'),
-          cell(1.5, '$total'),
+          cell(4, '${widget.name}'),
+          cell(2, '${widget.perTicket}'),
+          cell(1, '${widget.qty}'),
+          cell(2, '${widget.total}'),
         ],
       ),
     );
@@ -329,17 +358,20 @@ class TableRowData extends StatelessWidget {
 
   Widget cell(double width, String text) {
     return Container(
-      width: 50 * width,
+      width: MediaQuery.of(context).size.width * 0.024 * width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 8),
         child: Row(
           children: [
             Container(
-                width: 50 * width - 16,
-                child: Text(
-                  text,
-                  maxLines: 2,
-                )),
+              width: MediaQuery.of(context).size.width * 0.024 * width - 16,
+              child: Text(
+                text,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 13),
+              ),
+            ),
           ],
         ),
       ),

@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_windows
   connectivity_plus_windows
+  printing
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

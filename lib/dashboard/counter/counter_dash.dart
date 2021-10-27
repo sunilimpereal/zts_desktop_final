@@ -18,10 +18,10 @@ class _CounterDashState extends State<CounterDash> {
   late CategoryModel selectedCategory;
   List<Color> cardColors = [
     const Color(0xff008832),
-    const Color(0xff14846D),
-    const Color(0xff1C88A2),
+    const Color(0xff62b6cb),
+    const Color(0xff3d348b),
     const Color(0xff56282D),
-    const Color(0xff14846D),
+    const Color(0xfffa824c),
     const Color(0xFFA8201A),
     const Color(0xff),
     const Color(0xff),
@@ -62,7 +62,7 @@ class _CounterDashState extends State<CounterDash> {
                   ],
                 ),
                 const Positioned(right: 0, child: TicketSummaryCard()),
-                 Positioned(left: 0,bottom: 0, child: Container(width: 400,height: 300,child: TicketDisplay(),))
+                 Positioned(left: 0,bottom: 0, child: Container(width: 400,height: 160,child: TicketDisplay(),))
               ],
             ),
           );
