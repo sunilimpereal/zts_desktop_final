@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/generated_tickets.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/line_summary_model.dart';
 import 'package:zts_counter_desktop/repository/repositry.dart';
+import 'package:zts_counter_desktop/utils/methods.dart';
+import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 class TicketRepository {
   Future<List<GeneratedTickets>> getRecentTickets(BuildContext context) async {
@@ -22,11 +24,12 @@ class TicketRepository {
     }
   }
 
-    Future<List<LineSumryItem>> getFiletredLineItems(BuildContext context) async {
-    DateTime date = DateTime.now();
+  Future<List<LineSumryItem>> getFiletredLineItems(BuildContext context, DateTime date) async {
     final response = await API.get(
-        url:
-            'get-lineitems/?start_date=${date.toString().substring(0,10)}&end_date=${date.toString().substring(0,10)}',
+        logs: true,
+        url: getRole() == 'admin' || getRole() == 'manager'
+            ? 'get-lineitems/?start_date=${date.toString().substring(0, 10)}&end_date=${date.toString().substring(0, 10)}'
+            : 'get-lineitems/?user_email=${sharedPrefs.userEmail}&start_date=${date.toString().substring(0, 10)}&end_date=${date.toString().substring(0, 10)}',
         context: context);
     if (response.statusCode == 200) {
       List<LineSumryItem> ticketList = lineSumryItemFromJson(response.body);
@@ -35,9 +38,4 @@ class TicketRepository {
       return [];
     }
   }
-
-
-
-
-
 }

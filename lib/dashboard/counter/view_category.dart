@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
+import 'package:zts_counter_desktop/dashboard/counter/widgets/bottle_view.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/sub_category_card.dart';
 
 class ViewCategory extends StatefulWidget {
@@ -14,6 +17,10 @@ class ViewCategory extends StatefulWidget {
 class _ViewCategoryState extends State<ViewCategory> {
   @override
   Widget build(BuildContext context) {
+    if(widget.category.name=="Bottle"){
+      log("bottle");
+      return  BottleView(category: widget.category, color:Colors.blue,);
+    }
     return Expanded(
       child: Container(
         height: MediaQuery.of(context).size.height - 80,

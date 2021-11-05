@@ -66,16 +66,20 @@ class _CategoryCardState extends State<CategoryCard> {
               children: [
                 Row(
                   children: [
-                    Text(
-                      widget.categoryModel.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: widget.active ? Colors.white : widget.color,
+                    Container(
+                      width: 130,
+                      child: Text(
+                        widget.categoryModel.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: widget.active ? Colors.white : widget.color,
+                        ),
                       ),
                     )
                   ],
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Row(

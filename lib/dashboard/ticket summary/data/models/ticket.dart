@@ -20,7 +20,7 @@ class Ticket {
 
   String number;
   List<Lineitem> lineitems;
-  int price;
+  double price;
   DateTime issuedTs;
 
   factory Ticket.fromJson(Map<String, dynamic> json) => Ticket(
@@ -51,10 +51,10 @@ class Lineitem {
 
   String subcategoryName;
   String type;
-  int subcategoryPrice;
+  double subcategoryPrice;
   String category;
   int quantity;
-  int price;
+  double price;
   DateTime createdTs;
 
   factory Lineitem.fromJson(Map<String, dynamic> json) => Lineitem(

@@ -36,6 +36,7 @@ dependencies:
   dio: ^4.0.0
   http: ^0.13.4
   intl:
+  lottie: ^1.0.0
 
   #svg icons
   flutter_svg: ^0.23.0+1
@@ -44,6 +45,11 @@ dependencies:
   pdf: ^3.6.0
   open_file: ^3.2.1
   printing: ^5.6.0
+  qr_flutter: ^4.0.0
+  jwt_decoder: ^2.0.1
+
+  #datepicker
+  syncfusion_flutter_datepicker: ^19.3.48
 
 
   
@@ -77,6 +83,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/lottie/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

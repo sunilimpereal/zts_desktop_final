@@ -30,7 +30,9 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
     quanityFocus.addListener(() {
       log("message listner");
 
-      setState(() {});
+      setState(() {
+        quantityController.text ="";
+      });
     });
     super.initState();
   }
@@ -53,7 +55,7 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
               color: Colors.grey.withOpacity(0.1),
               spreadRadius: 5,
               blurRadius: 16,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
           color: Colors.transparent,
@@ -149,6 +151,7 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
                   quantity: int.parse(quantityController.text),
                 );
               },
+              
               focusNode: quanityFocus,
               style: TextStyle(color:widget.color, fontSize: 32),
               backgroundCursorColor: Colors.greenAccent,

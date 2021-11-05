@@ -120,7 +120,7 @@ class _LoginPageState extends State<LoginPage> {
                     context: context,
                   )
                       .then((value) {
-                    Future.delayed(const Duration(milliseconds: 100)).then((value1) {
+                    Future.delayed(const Duration(milliseconds: 200)).then((value1) {
                       if (value) Navigator.pushReplacementNamed(context, '/dashboard');
                       setState(() {
                         loginFailFlag = !value;

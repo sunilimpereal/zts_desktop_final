@@ -12,7 +12,7 @@ class API {
     'Accept': 'application/json',
     'Authorization': 'Bearer ${sharedPref.token}',
   };
-   static Map<String, String>? postheaders = {
+  static Map<String, String>? postheaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'Authorization': 'Bearer ${sharedPref.token}',
@@ -21,13 +21,15 @@ class API {
   static Future<Response> get({
     required BuildContext context,
     required String url,
+    bool? logs,
+     Map<String, String>? headers1,
   }) async {
     try {
-      log('url: ${config.API_ROOT + url} ');
-      var response = await http.get(Uri.parse(config.API_ROOT + url), headers: headers);
-      log('respose: ${response.statusCode}');
-      log('respose: ${response.body}');
-      if(response.statusCode == 401){
+      logs??false?log('url: ${config.API_ROOT + url} '):null;
+      var response = await http.get(Uri.parse(config.API_ROOT + url), headers: headers1??headers);
+      logs??false?log('respose: ${response.statusCode}'):null;
+      logs??false?log('respose: ${response.body}'):null;
+      if (response.statusCode == 401) {
         CheckLoginProvider.of(context)?.logout();
       }
       return response;
@@ -38,17 +40,21 @@ class API {
 
   static Future<Response> post({
     required String url,
-    required Object body, required BuildContext context,
+    required Object body,
+    required BuildContext context,
     Map<String, String>? headers,
+    bool? logs
   }) async {
     try {
-      log('url: ${config.API_ROOT + url} ');
-      log('body: $body');
-      var response =
-          await http.post(Uri.parse(config.API_ROOT + url), body: body, headers: headers??postheaders);
-      log('respose: ${response.statusCode}');
-      log('respose: ${response.body}');
-
+      logs??false?  log('url: ${config.API_ROOT + url} '):null;
+      logs??false? log('body: $body'):null;
+      var response = await http.post(Uri.parse(config.API_ROOT + url),
+          body: body, headers: headers ?? postheaders);
+      logs??false?log('respose: ${response.statusCode}'):null;
+      logs??false?log('respose: ${response.body}'):null;
+      if (response.statusCode == 401) {
+        CheckLoginProvider.of(context)?.logout();
+      }
       return response;
     } finally {
       //TODO : Dialog box

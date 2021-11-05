@@ -14,12 +14,12 @@ class RecentTicketBloc extends Bloc {
   RecentTicketBloc(this.context) {
     getRecentTickets();
     getTicketHistory();
-    getLineItemSumry();
+    getLineItemSumry(DateTime.now());
   }
   final _recentTicektcontroller = BehaviorSubject<List<GeneratedTickets>>();
   final _ticektHistorycontroller = BehaviorSubject<List<GeneratedTickets>>();
   final _lineItemSumrycontroller = BehaviorSubject<List<LineSumryItem>>();
-
+  DateTime selectedDate = DateTime.now();
   Stream<List<GeneratedTickets>> get recentTicketStream =>
       _recentTicektcontroller.stream.asBroadcastStream();
   Stream<List<GeneratedTickets>> get ticketHistoryStream =>
@@ -39,9 +39,10 @@ class RecentTicketBloc extends Bloc {
     _ticektHistorycontroller.sink.add(result);
   }
 
-    void getLineItemSumry() async {
+    void getLineItemSumry(DateTime date) async {
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getFiletredLineItems(context);
+    final result = await ticketRepository.getFiletredLineItems(context,date);
+    selectedDate = date;
     _lineItemSumrycontroller.sink.add(result);
   }
 

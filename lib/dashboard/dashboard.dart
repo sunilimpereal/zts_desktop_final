@@ -1,16 +1,22 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
 import 'package:zts_counter_desktop/dashboard/counter/counter_dash.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
+import 'package:zts_counter_desktop/dashboard/printer/printer_dash.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/generated_ticket_card.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/tab_bar_selector.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/screen/ticket_summary.dart';
 
 import 'package:zts_counter_desktop/main.dart';
+import 'package:zts_counter_desktop/utils/connection_state.dart';
+import 'package:zts_counter_desktop/utils/methods.dart';
+import 'package:zts_counter_desktop/utils/network_status_widget.dart';
 
 class DashBoardWrapper extends StatefulWidget {
   const DashBoardWrapper({Key? key}) : super(key: key);
@@ -35,6 +41,7 @@ class _DashBoardWrapperState extends State<DashBoardWrapper> {
 enum Screens {
   counter,
   tickets,
+  printer,
 }
 
 class Dashboard extends StatefulWidget {
@@ -77,12 +84,8 @@ class _DashboardState extends State<Dashboard> {
                 Container(
                   padding: const EdgeInsets.all(0),
                   child: Column(
-                    children: [
-                      Container(
-                        child: topBar(),
-                      ),
-                      selectedScreenDisplay(categoryBloc)
-                    ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [topBar(), selectedScreenDisplay(categoryBloc)],
                   ),
                 ),
               ],
@@ -99,22 +102,26 @@ class _DashboardState extends State<Dashboard> {
         return counterScreen(categoryBloc);
       case Screens.tickets:
         return ticketScreen(categoryBloc);
+      case Screens.printer:
+        return printerScreen(categoryBloc);
       default:
         return Container();
     }
   }
 
   Widget counterScreen(CategoryBloc categoryBloc) {
-    return Row(
-      children: [
-        StreamBuilder<List<CategoryModel>>(
-            stream: categoryBloc.categoryListStream,
-            builder: (context, snapshot) {
-              return CounterDash(
-                categoryList: snapshot.data ?? [],
-              );
-            }),
-      ],
+    return Container(
+      child: Row(
+        children: [
+          StreamBuilder<List<CategoryModel>>(
+              stream: categoryBloc.categoryListStream,
+              builder: (context, snapshot) {
+                return CounterDash(
+                  categoryList: snapshot.data ?? [],
+                );
+              }),
+        ],
+      ),
     );
   }
 
@@ -122,41 +129,67 @@ class _DashboardState extends State<Dashboard> {
     return const TicketSummaryScreen();
   }
 
+  Widget printerScreen(CategoryBloc categoryBloc) {
+    return const PrinterDash();
+  }
+
   Widget topBar() {
+    final MyConnectivity _connectivity = MyConnectivity.instance;
+    Map _source = {ConnectivityResult.none: false};
     return Container(
-      height: 80,
+      width: MediaQuery.of(context).size.width * 0.9,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TabBarSelector(
-              title: 'Counter',
-              width: 130,
-              ontap: () {
-                changeScreen(Screens.counter);
-              },
-              selected: selectedScreen == Screens.counter,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TabBarSelector(
+                  title: 'Counter',
+                  width: 130,
+                  ontap: () {
+                    changeScreen(Screens.counter);
+                  },
+                  selected: selectedScreen == Screens.counter,
+                ),
+                TabBarSelector(
+                  title: 'Tickets',
+                  width: 130,
+                  ontap: () {
+                    TicketProvider.of(context).getLineItemSumry(DateTime.now());
+                    changeScreen(Screens.tickets);
+                  },
+                  selected: selectedScreen == Screens.tickets,
+                ),
+                getRole() == 'admin' || getRole() == 'manager'
+                    ? TabBarSelector(
+                        title: 'Printer',
+                        width: 130,
+                        ontap: () {
+                          changeScreen(Screens.printer);
+                        },
+                        selected: selectedScreen == Screens.printer,
+                      )
+                    : Container(),
+                TabBarSelector(
+                  title: 'Logout',
+                  width: 130,
+                  selected: false,
+                  ontap: () {
+                    CheckLoginProvider.of(context)?.logout();
+                  },
+                ),
+              ],
             ),
-            TabBarSelector(
-              title: 'Tickets',
-              width: 130,
-              ontap: () {
-                changeScreen(Screens.tickets);
-              },
-              selected: selectedScreen == Screens.tickets,
-            ),
-            TabBarSelector(
-              title: 'Logout',
-              width: 130,
-              selected: false,
-              ontap: () {
-                CheckLoginProvider.of(context)?.logout();
-              },
-            ),
+            NetworkStatusWidget()
           ],
         ),
       ),
     );
   }
+
+
 }

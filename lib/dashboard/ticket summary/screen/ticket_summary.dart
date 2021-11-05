@@ -14,19 +14,17 @@ class TicketSummaryScreen extends StatefulWidget {
 class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
   @override
   Widget build(BuildContext context) {
-    log( "date"+ DateTime.now().toString());
     return Expanded(
       child: Container(
         padding: EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Text('Ticket History'),
-              ],
+          
+            const SizedBox(
+              height: 8,
             ),
-            TicketHistoryTable()
+            const TicketHistoryTable()
           ],
         ),
       ),

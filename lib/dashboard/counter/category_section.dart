@@ -27,7 +27,7 @@ class _CategorySelectionState extends State<CategorySelection> {
     return Container(
       // color: Colors.green.withOpacity(0.1),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-      height: MediaQuery.of(context).size.height - 80,
+      height: MediaQuery.of(context).size.height - 82,
       width: MediaQuery.of(context).size.width * 0.35,
       decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -41,9 +41,9 @@ class _CategorySelectionState extends State<CategorySelection> {
       child: GridView.count(
         crossAxisCount: 3,
         shrinkWrap: true,
-        crossAxisSpacing: 25,
-        mainAxisSpacing: 25,
-        childAspectRatio: 0.88,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.9,
         children: List.generate(widget.categoryList.length, (index) {
           return CategoryCard(
             color:widget.colorList[index],

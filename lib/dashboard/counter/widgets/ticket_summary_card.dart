@@ -10,6 +10,7 @@ import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_r
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/printer/bill_pdf.dart';
+import 'package:zts_counter_desktop/utils/methods.dart';
 
 class TicketSummaryCard extends StatefulWidget {
   const TicketSummaryCard({Key? key}) : super(key: key);
@@ -119,28 +120,25 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                                   height: 48,
                                   child: ElevatedButton(
                                     onPressed: () async {
-                                      if (!(getTotalCategory(snapshot.data ?? []) == 0)) {
+                                       createFolderInAppDocDir("bills");
+                                      log(getTotalCategory(snapshot.data ?? []).toString());
+                                      if ((getTotalCategory(snapshot.data ?? []) != 0)) {
                                         CategoryRepository categoryRepository =
                                             CategoryRepository();
+                                        List<CategoryModel> categorylist = snapshot.data ?? [];
+                                        log(categorylist.toString());
+                                        for (CategoryModel category in categorylist) {
+                                          if (category.categoryQyantity != 0) {
+                                            log(category.name);
+                                            await categoryRepository
+                                                .generateTicket(context: context, category: category).then((value) {
+                                                  log(value.toString());
+                                                });
+                                          }
+                                        }
 
-                                        final pdfFile = await PdfApi.zooBill();
-                                        final pdf = pdfFile.readAsBytes();
-
-                                        await Printing.layoutPdf(onLayout: (_) => pdf);
-                                        PdfApi.openFile(pdfFile);
-
-                                        // categoryRepository
-                                        //     .generateTicket(
-                                        //         context: context, list: snapshot.data ?? [])
-                                        //     .then((value) async {
-
-                                        //   log('returned data $value');
-                                        //   if (value) {
-
-                                        //     CategoryProvider.of(context).getCategoryList();
-                                        //     TicketProvider.of(context).getRecentTickets();
-                                        //   }
-                                        // });
+                                        CategoryProvider.of(context).getCategoryList();
+                                        TicketProvider.of(context).getRecentTickets();
                                       }
                                     },
                                     child: const Text(
@@ -226,7 +224,7 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
               Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 16,
-                  horizontal: 8,
+                  horizontal: 4,
                 ),
                 child: Row(
                   children: [
@@ -269,7 +267,7 @@ class _TableRowHeadingState extends State<TableRowHeading> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
       color: widget.heading ? Theme.of(context).primaryColor.withOpacity(0.3) : Colors.transparent,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,14 +290,13 @@ class _TableRowHeadingState extends State<TableRowHeading> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-               width: MediaQuery.of(context).size.width * 0.024 * width-8,
+              width: MediaQuery.of(context).size.width * 0.024 * width - 8,
               child: Text(
                 text,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  
                   fontSize: 12,
                 ),
               ),
