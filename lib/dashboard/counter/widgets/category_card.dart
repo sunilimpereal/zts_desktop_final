@@ -26,7 +26,6 @@ class _CategoryCardState extends State<CategoryCard> {
   Widget build(BuildContext context) {
     CategoryBloc categoryBloc = CategoryProvider.of(context);
     return Container(
-     
       decoration: BoxDecoration(
         color: Colors.transparent,
         boxShadow: [
@@ -54,8 +53,6 @@ class _CategoryCardState extends State<CategoryCard> {
           splashColor: widget.color..withOpacity(0.5),
           highlightColor: widget.color.withOpacity(0.2),
           child: Container(
-            height: 250,
-            width: 180,
             decoration: BoxDecoration(
               border: Border.all(color: widget.color, width: 2),
               borderRadius: BorderRadius.circular(8),
@@ -67,12 +64,12 @@ class _CategoryCardState extends State<CategoryCard> {
                 Row(
                   children: [
                     Container(
-                      width: 130,
+                      width: MediaQuery.of(context).size.width * 0.08,
                       child: Text(
                         widget.categoryModel.name,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: MediaQuery.of(context).size.width * 0.0098,
                           color: widget.active ? Colors.white : widget.color,
                         ),
                       ),

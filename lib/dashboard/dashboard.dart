@@ -9,7 +9,6 @@ import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart'
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/printer/printer_dash.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
-import 'package:zts_counter_desktop/dashboard/counter/widgets/generated_ticket_card.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/tab_bar_selector.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/screen/ticket_summary.dart';
 
@@ -32,7 +31,7 @@ class _DashBoardWrapperState extends State<DashBoardWrapper> {
       context: context,
       child: TicketProvider(
         context: context,
-        child: Dashboard(),
+        child: const Dashboard(),
       ),
     );
   }
@@ -69,7 +68,7 @@ class _DashboardState extends State<Dashboard> {
       builder: (context, snapshot) {
         log('loggedin : ${snapshot.data}');
         if (snapshot.hasData) {
-          Future.delayed(Duration(milliseconds: 50)).then((value) {
+          Future.delayed(const Duration(milliseconds: 50)).then((value) {
             if (snapshot.data == false) {
               Navigator.pushReplacementNamed(context, '/login');
               // !sharedPref.loggedIn ? Navigator.pushReplacementNamed(context, '/login') : null;
@@ -139,7 +138,7 @@ class _DashboardState extends State<Dashboard> {
     return Container(
       width: MediaQuery.of(context).size.width * 0.9,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -160,6 +159,7 @@ class _DashboardState extends State<Dashboard> {
                   width: 130,
                   ontap: () {
                     TicketProvider.of(context).getLineItemSumry(DateTime.now());
+                    TicketProvider.of(context).getTicketHistory();
                     changeScreen(Screens.tickets);
                   },
                   selected: selectedScreen == Screens.tickets,
@@ -184,12 +184,26 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
-            NetworkStatusWidget()
+            Row(
+              children: [
+                const NetworkStatusWidget(),
+                const SizedBox(
+                  width: 24,
+                ),
+                Container(
+                  height: 40,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage("assets/images/logo.png")
+                    )
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),
     );
   }
-
-
 }

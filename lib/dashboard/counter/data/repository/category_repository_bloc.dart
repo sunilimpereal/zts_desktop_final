@@ -17,15 +17,22 @@ class CategoryBloc extends Bloc {
   Stream<List<CategoryModel>> get categoryListStream => _controller.stream.asBroadcastStream();
   Stream<CategoryModel> get selectedcategoryStream =>
       _selectedCategoryController.stream.asBroadcastStream();
-  void getCategoryList() async {
+  Future<bool> getCategoryList() async {
     CategoryRepository _categoryRepository = CategoryRepository();
     final result = await _categoryRepository.getCategory(context);
     result.isNotEmpty ? _selectedCategoryController.sink.add(result[0]) : null;
     _controller.sink.add(result);
+    return result.isNotEmpty ? true : false;
   }
 
   void updateCategoryList(List<CategoryModel> updatedList) async {
     _controller.sink.add(updatedList);
+  }
+
+    bool updateCategorytZero(List<CategoryModel> updatedList)  {
+     _controller.sink.add(updatedList);
+     //to disable the loading button 
+    return true;
   }
 
   void updateCategoryQuantity(

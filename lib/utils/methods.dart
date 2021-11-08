@@ -46,7 +46,7 @@ printPdf({required File pdfFile, required Ticket ticket}) async {
           onLayout: (_) => pdf)
       : await Printing.layoutPdf(onLayout: (_) => pdf);
   String path = await createFolderInAppDocDir("bills");
-  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+  // PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
 }
 
 Future<Uint8List> toQrImageData(String text) async {

@@ -39,6 +39,7 @@ void main() async {
   runApp(const AppWrapperProvider());
   doWhenWindowReady(() {
     final win = appWindow;
+    
     final initialSize = Size(1920, 1080);
     win.minSize = const Size(800, 600);
     win.size = initialSize;

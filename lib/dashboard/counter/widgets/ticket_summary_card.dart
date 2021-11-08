@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:advance_notification/advance_notification.dart';
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
@@ -20,6 +21,7 @@ class TicketSummaryCard extends StatefulWidget {
 }
 
 class _TicketSummaryCardState extends State<TicketSummaryCard> {
+  bool loadingPrintButton = false;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -119,32 +121,108 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                                   width: 200,
                                   height: 48,
                                   child: ElevatedButton(
-                                    onPressed: () async {
-                                       createFolderInAppDocDir("bills");
-                                      log(getTotalCategory(snapshot.data ?? []).toString());
-                                      if ((getTotalCategory(snapshot.data ?? []) != 0)) {
-                                        CategoryRepository categoryRepository =
-                                            CategoryRepository();
-                                        List<CategoryModel> categorylist = snapshot.data ?? [];
-                                        log(categorylist.toString());
-                                        for (CategoryModel category in categorylist) {
-                                          if (category.categoryQyantity != 0) {
-                                            log(category.name);
-                                            await categoryRepository
-                                                .generateTicket(context: context, category: category).then((value) {
-                                                  log(value.toString());
-                                                });
-                                          }
-                                        }
+                                    onPressed: loadingPrintButton
+                                        ? () {}
+                                        : () async {
+                                            setState(() {
+                                              loadingPrintButton = true;
+                                            });
 
-                                        CategoryProvider.of(context).getCategoryList();
-                                        TicketProvider.of(context).getRecentTickets();
-                                      }
-                                    },
-                                    child: const Text(
-                                      'PRINT',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
+                                            createFolderInAppDocDir('bills');
+                                            log(getTotalCategory(snapshot.data ?? []).toString());
+                                            if ((getTotalCategory(snapshot.data ?? []) != 0)) {
+                                              CategoryRepository categoryRepository =
+                                                  CategoryRepository();
+                                              List<CategoryModel> categorylist =
+                                                  snapshot.data ?? [];
+                                              log(categorylist.toString());
+                                              List<CategoryModel> filterCategorylist = [];
+
+                                              for (CategoryModel category in categorylist) {
+                                                if (category.categoryQyantity != 0) {
+                                                  if (category.name.contains('Parking')) {
+                                                    await categoryRepository.generateTicket(
+                                                        context: context,
+                                                        categorylist: [category]).then((value) {
+                                                      log(value.toString());
+                                                    });
+                                                    continue;
+                                                  }
+                                                  if (category.name.contains('Locker')) {
+                                                    await categoryRepository.generateTicket(
+                                                        context: context,
+                                                        categorylist: [category]).then((value) {
+                                                      log(value.toString());
+                                                    });
+                                                    continue;
+                                                  }
+                                                  if (category.name
+                                                      .contains('Battery Operated Vehicle')) {
+                                                    await categoryRepository.generateTicket(
+                                                        context: context,
+                                                        categorylist: [category]).then((value) {
+                                                      log(value.toString());
+                                                    });
+                                                    continue;
+                                                  }
+
+                                                  filterCategorylist.add(category);
+                                                }
+                                              }
+                                            filterCategorylist.isNotEmpty?  await categoryRepository
+                                                  .generateTicket(
+                                                      context: context,
+                                                      categorylist: filterCategorylist)
+                                                  .then((value) {
+                                                log(value.toString());
+                                              }):null;
+                                              setState(() {
+                                                log('message loading');
+                                                loadingPrintButton = !CategoryProvider.of(context)
+                                                    .updateCategorytZero(
+                                                        convertCategorytoZero(snapshot.data ?? []));
+                                              });
+                                              // CategoryProvider.of(context)
+                                              //     .getCategoryList()
+                                              //     .then((value) {
+                                              //   setState(() {
+                                              //     loadingPrintButton = value ? false : true;
+                                              //   });
+                                              // });
+                                              TicketProvider.of(context).getRecentTickets();
+                                            } else {
+                                              // AdvanceSnackBar(
+                                              //   message: 'Notification Message',
+                                              //   mode: 'B',
+                                              //   duration: Duration(seconds: 5),
+                                              //   child: Container(
+                                              //     height: 50,
+                                              //     width: 50,
+                                              //     color: Colors.red,
+                                              //   )
+
+                                              // ).show(context);
+                                              setState(() {
+                                                loadingPrintButton = false;
+                                              });
+                                            }
+                                          },
+                                    child: loadingPrintButton
+                                        ? const Center(
+                                            child: SizedBox(
+                                              width: 25,
+                                              height: 25,
+                                              child: Center(
+                                                child: CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        : const Text(
+                                            'PRINT',
+                                            style: TextStyle(fontSize: 20),
+                                          ),
                                   ),
                                 );
                               }),
@@ -159,6 +237,17 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
         ),
       ),
     );
+  }
+
+  List<CategoryModel> convertCategorytoZero(List<CategoryModel> list) {
+    List<CategoryModel> newList = list;
+    for (CategoryModel categoryModel in newList) {
+      categoryModel.categoryQyantity = 0;
+      for (Subcategory subCategory in categoryModel.subcategories) {
+        subCategory.quantity = 0;
+      }
+    }
+    return newList;
   }
 
   int getTotalCategory(List<CategoryModel> list) {

@@ -26,6 +26,7 @@ class SharedPref {
   /// Set as logged out
   setLoggedOut() {
     _sharedPref!.setBool('loggedIn', false);
+    setAuthToken(token: "");
     // _sharedPref!.remove('authToken');
   }
 

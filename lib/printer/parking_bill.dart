@@ -17,6 +17,8 @@ import 'package:zts_counter_desktop/utils/shared_pref.dart';
 import 'dart:io';
 
 class ParkingPdf {
+  static Uint8List fontData = File('assets/fonts/NotoSerifKannada-Medium.ttf').readAsBytesSync();
+  static Font kannada = Font.ttf(fontData.buffer.asByteData());
   static Future<File> parkingBill({
     required List<CategoryModel> listCategory,
     required String ticketNumber,
@@ -32,6 +34,10 @@ class ParkingPdf {
     final elephantlogo = pw.MemoryImage(
       (await rootBundle.load('assets/images/elephantlogo.png')).buffer.asUint8List(),
     );
+    final zootitle =
+        pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
+    final karanji =
+        pw.MemoryImage((await rootBundle.load('assets/images/karanji.png')).buffer.asUint8List());
 
     DateTime time = DateTime.now();
     List<Category> lineList = getselectedLineItem(listCategory);
@@ -44,65 +50,71 @@ class ParkingPdf {
     }
     pdf.addPage(MultiPage(
         pageFormat: PdfPageFormat.roll57.copyWith(
-          height: 190 + (printlines * 12),
-          marginLeft: 0.3 * PdfPageFormat.cm,
-          marginRight: 0.3 * PdfPageFormat.cm,
+          height: 360 + (printlines * 26),
+          marginLeft: 6 * PdfPageFormat.mm,
+          marginRight: 6 * PdfPageFormat.mm,
         ),
-        build: (pw.Context context) => [
-              pw.Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+           build: (pw.Context context) => [
+         pw.Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  pw.Container(height: 15, child: pw.Image(elephantlogo)),
-                  pw.SizedBox(width: 4),
-                  pw.Container(
-                    width: 100,
-                    child: pw.Text('${sharedPrefs.organizationName}',
-                        style: const TextStyle(fontSize: 12)),
-                  ),
+                  sharedPrefs.userEmail == 'karanji1@myszoo.com'
+                      ? pw.Container(height: 25, child: pw.Image(karanji))
+                      : pw.Container(height: 25, child: pw.Image(zootitle)),
+                  pw.SizedBox(width: 8),
                 ],
               ),
-              pw.SizedBox(height: 8),
-              pw.Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                pw.SizedBox(height: 2),
-                Pdftext(text: 'SAVE FOREST, SAVE WILDLIFE'),
-                pw.SizedBox(height: 4),
-                Pdftext(text: 'Ticket Number : ${ticketNumber}'),
-                Pdftext(text: 'Time : ${DateFormat('yyyy/MM/dd kk:mm').format(time)}'),
-                pw.SizedBox(height: 4),
-                // tableleHeader(),
+          pw.SizedBox(height: 8),
+          pw.Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            pw.SizedBox(height: 2),
+            Pdftext(text: 'SAVE FOREST, SAVE WILDLIFE',fontSize: 10),
+            pw.SizedBox(height: 4),
+            Pdftext(text: 'Ticket Number : ${ticketNumber}',fontSize: 10),
+            pw.SizedBox(height: 4),
+            Pdftext(text: 'Time : ${DateFormat('dd/MM/yyyy kk:mm').format(time)}',fontSize: 10),
+            pw.SizedBox(height: 4),
+            // tableleHeader(),
 
-                pw.Column(children: lineList.map((e) => lineItem(e)).toList()),
-                pw.SizedBox(height: 4),
-                pw.Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    pw.Container(child: pw.Text("TOTAL :", style: const TextStyle(fontSize: 12))),
-                    pw.SizedBox(width: 4, height: 8),
-                    pw.Container(
-                      child: pw.Text(' Rs. $total',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    ),
-                    pw.SizedBox(width: 8, height: 8),
-                  ],
+            pw.Column(children: lineList.map((e) => lineItem(e)).toList()),
+            pw.SizedBox(height: 4),
+            pw.Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Container(child: pw.Text('TOTAL :', style: const TextStyle(fontSize: 10))),
+                pw.SizedBox(width: 4, height: 8),
+                pw.Container(
+                  child: pw.Text(' ₹ $total',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, font: kannada)),
                 ),
-                pw.SizedBox(height: 4),
-                pw.Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  pw.Container(width: 60, child: pw.Image(qrcode)),
-                ]),
-
-                pw.SizedBox(height: 8),
-                Pdftext(text: 'THANK YOU VISIT AGAIN...'),
-                Pdftext(text: 'LOVE AND PROTECT ANIMALS...'),
-                pw.SizedBox(height: 3),
-                pw.Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Pdftext(text: 'Powered By '),
-                    pw.Container(height: 8, child: pw.Image(logo)),
-                  ],
-                ),
-              ]),
-            ]));
+                pw.SizedBox(width: 8, height: 8),
+              ],
+            ),
+            // zooInvoice(people),
+            pw.SizedBox(width: 8, height: 8),
+            pw.Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              pw.Container(
+                  width: 200, height: 80, child: pw.Image(qrcode, fit: pw.BoxFit.contain)),
+            ]),
+            pw.SizedBox(width: 8, height: 8),
+            Pdftext(text: 'THANK YOU VISIT AGAIN...',fontSize: 9),
+            Pdftext(text: 'LOVE AND PROTECT ANIMALS...',fontSize: 9),
+            pw.SizedBox(height: 3),
+            pw.Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                  Pdftext(text: 'Powered By ',fontSize: 9),
+                  pw.SizedBox(height: 3),
+                  pw.Container(height: 24, child: pw.Image(logo)),
+                ])
+              ],
+            ),
+          ]),
+        ],
+      
+      
+       ));
 
     return saveDocument(name: 'zooBill.pdf', pdf: pdf);
   }
@@ -110,8 +122,9 @@ class ParkingPdf {
   static Widget lineItem(Category dataList) {
     return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
       pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(vertical: 8),
-        child: Pdftext(text: 'Parking', fontSize: 12, heightPadding: 2, fontWeight: FontWeight.bold),
+        padding: const pw.EdgeInsets.symmetric(vertical: 4),
+        child:
+            Pdftext(text: 'Parking', fontSize: 12, heightPadding: 2, fontWeight: FontWeight.bold),
       ),
       zooInvoice(dataList.dataList)
     ]);
@@ -119,16 +132,16 @@ class ParkingPdf {
 
   static Widget zooInvoice(List<TableRowDataPDF> dataList) {
     final data = dataList.map((item) {
-      return [item.name, item.perTicket, item.qty, item.total];
+      return [item.name, item.perTicket, item.qty, item.total.round()];
     }).toList();
-    final headerList = ['       ', 'per Ticket', ' QTY', 'Total'];
+    final headerList = ['       ', '  per \nTicket', ' QTY', 'Total'];
     return pw.Column(children: [
       Table.fromTextArray(
         headers: headerList,
         data: data,
         border: const TableBorder(bottom: BorderSide(width: 0.3), top: BorderSide(width: 0.3)),
-        headerStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.normal),
-        cellStyle: const TextStyle(fontSize: 10),
+        headerStyle: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+        cellStyle: const TextStyle(fontSize: 9),
         headerDecoration: const pw.BoxDecoration(
           border: pw.Border(
             bottom: pw.BorderSide(
@@ -138,6 +151,11 @@ class ParkingPdf {
         ),
         cellHeight: 1,
         cellPadding: const pw.EdgeInsets.all(2),
+        columnWidths: {
+          0: FlexColumnWidth(4),
+          1: FlexColumnWidth(3),
+          2: FlexColumnWidth(2.5),
+        },
         cellAlignments: {
           0: Alignment.centerLeft,
           1: Alignment.centerRight,

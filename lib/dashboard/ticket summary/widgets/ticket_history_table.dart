@@ -102,7 +102,7 @@ class _TicketHistoryTableState extends State<TicketHistoryTable> {
                                                   element.name == sharedPref.getPrinter),
                                               onLayout: (_) => pdf)
                                           : await Printing.layoutPdf(onLayout: (_) => pdf);
-                                      PdfApi.openFile(pdfFile);
+                                      //  PdfApi.openFile(pdfFile);
                                     },
                                     child: const Text('Print Summary'));
                               })

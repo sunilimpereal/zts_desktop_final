@@ -29,13 +29,13 @@ class RecentTicketBloc extends Bloc {
 
   void getRecentTickets() async {
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getRecentTickets(context);
+    final result = await ticketRepository.getRecentTickets(context:context,showonlyHour: true);
     _recentTicektcontroller.sink.add(result);
   }
 
   void getTicketHistory() async {
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getRecentTickets(context);
+    final result = await ticketRepository.getRecentTickets(context:context,showonlyHour: false);
     _ticektHistorycontroller.sink.add(result);
   }
 

@@ -31,7 +31,7 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
       log("message listner");
 
       setState(() {
-        quantityController.text ="";
+        quantityController.text = "";
       });
     });
     super.initState();
@@ -67,8 +67,8 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
           child: InkWell(
             child: Container(
               padding: const EdgeInsets.all(8),
-              width: MediaQuery.of(context).size.width*0.36,
-              height: 80,
+              width: MediaQuery.of(context).size.width * 0.36,
+              // height: 80,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -77,13 +77,16 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          widget.subcategory.name + " " + widget.subcategory.type,
-                            textScaleFactor: 1,
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6
-                                ?.copyWith(color: widget.color)),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: Text(widget.subcategory.name + " " + widget.subcategory.type,
+                              textScaleFactor: 1,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  ?.copyWith(color: widget.color)),
+                        ),
+                        SizedBox(height: 10,),
                         Text('₹ ${widget.subcategory.price.toString()}')
                       ],
                     ),
@@ -151,9 +154,8 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
                   quantity: int.parse(quantityController.text),
                 );
               },
-              
               focusNode: quanityFocus,
-              style: TextStyle(color:widget.color, fontSize: 32),
+              style: TextStyle(color: widget.color, fontSize: 32),
               backgroundCursorColor: Colors.greenAccent,
               cursorColor: Colors.green,
             ),
@@ -184,7 +186,6 @@ class _SubCategoryCardState extends State<SubCategoryCard> {
           child: Container(
             width: 42,
             height: 42,
-           
             child: Center(
               child: Icon(
                 icon,

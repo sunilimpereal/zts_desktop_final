@@ -80,7 +80,7 @@ class _CounterDashState extends State<CounterDash> {
                     bottom: 0,
                     child: Container(
                       width: 400,
-                      height: 160,
+                      height: 80,
                       child: TicketDisplay(),
                     ))
               ],

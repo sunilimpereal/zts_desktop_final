@@ -50,6 +50,10 @@ dependencies:
 
   #datepicker
   syncfusion_flutter_datepicker: ^19.3.48
+  syncfusion_flutter_pdf: ^19.3.48-beta
+
+  #notification
+  advance_notification: ^1.0.5
 
 
   

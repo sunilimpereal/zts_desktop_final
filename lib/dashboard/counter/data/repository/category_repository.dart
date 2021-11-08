@@ -38,11 +38,16 @@ class CategoryRepository {
 
   Future<bool> generateTicket({
     required BuildContext context,
-    required CategoryModel category,
+    required List<CategoryModel> categorylist,
   }) async {
-    Ticket ticket = getTicket([category]);
+      Map<String, String>? postheaders = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Bearer ${sharedPref.token}',
+  };
+    Ticket ticket = getTicket(categorylist);
     final response =
-        await API.post(url: 'ticket/', context: context, body: ticketToJson([ticket]), logs: true);
+        await API.post(url: 'ticket/',headers: postheaders, context: context, body: ticketToJson([ticket]), logs: true);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       List<PostTicketResponse> ticketResponse = postTicketResponseFromJson(response.body);
@@ -51,8 +56,8 @@ class CategoryRepository {
             ticketNumber: ticket.number,
             dateTime: ticket.issuedTs,
             qrImage: await toQrImageData(ticketResponse[0].uuid),
-            total: getTotalCategory([category]),
-            listCategory: [category]);
+            total: getTotalCategory(categorylist),
+            listCategory: categorylist);
 
         final pdf = pdfFile.readAsBytes();
         List<Printer> printerList = await Printing.listPrinters();
@@ -63,16 +68,16 @@ class CategoryRepository {
                 onLayout: (_) => pdf)
             : await Printing.layoutPdf(onLayout: (_) => pdf);
         String path = await createFolderInAppDocDir("bills");
-        PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
         return true;
       }
-      if (category.name == "Locker") {
+      if (categorylist[0].name == "Locker") {
         log("locker");
         final pdfFile = await PdfApi.zooBill(
-            listCategory: [category],
+            listCategory: categorylist,
             ticketNumber: ticket.number,
             dateTime: ticket.issuedTs,
-            total: getTotalCategory([category]),
+            total: getTotalCategory(categorylist),
             image: await toQrImageData(ticketResponse[0].uuid));
         final pdf = pdfFile.readAsBytes();
         List<Printer> printerList = await Printing.listPrinters();
@@ -89,15 +94,15 @@ class CategoryRepository {
                 onLayout: (_) => pdf)
             : await Printing.layoutPdf(onLayout: (_) => pdf);
         String path = await createFolderInAppDocDir("bills");
-        PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
         return true;
       }
 
       final pdfFile = await PdfApi.zooBill(
-          listCategory: [category],
+          listCategory: categorylist,
           ticketNumber: ticket.number,
           dateTime: ticket.issuedTs,
-          total: getTotalCategory([category]),
+          total: getTotalCategory(categorylist),
           image: await toQrImageData(ticketResponse[0].uuid));
       final pdf = pdfFile.readAsBytes();
       List<Printer> printerList = await Printing.listPrinters();
@@ -107,7 +112,7 @@ class CategoryRepository {
               onLayout: (_) => pdf)
           : await Printing.layoutPdf(onLayout: (_) => pdf);
       String path = await createFolderInAppDocDir("bills");
-      PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
       return true;
     } else {
       return false;
