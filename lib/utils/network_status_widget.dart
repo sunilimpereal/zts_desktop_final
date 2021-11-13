@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:zts_counter_desktop/utils/methods.dart';
 
 class NetworkStatusWidget extends StatefulWidget {
   const NetworkStatusWidget({Key? key}) : super(key: key);
@@ -34,14 +35,7 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget> {
     });
   }
 
-  Future<bool> hasNetwork() async {
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException catch (_) {
-      return false;
-    }
-  }
+
 
   bool networkStatus = false;
   @override

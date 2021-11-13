@@ -5,6 +5,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 import 'package:printing/printing.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -20,14 +21,13 @@ import 'package:zts_counter_desktop/utils/methods.dart';
 import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 class CategoryRepository {
-
   Future<List<CategoryModel>> getCategory(BuildContext context) async {
-         Map<String, String>? headers = {
-    // 'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer ${sharedPref.token}',
-  };
-    final response = await API.get(url: 'category/', context: context,headers1: headers);
+    Map<String, String>? headers = {
+      // 'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ${sharedPref.token}',
+    };
+    final response = await API.get(url: 'category/', context: context, headers1: headers);
     if (response.statusCode == 200) {
       List<CategoryModel> categoryList = categoryModelFromJson(response.body);
       return categoryList;
@@ -40,83 +40,58 @@ class CategoryRepository {
     required BuildContext context,
     required List<CategoryModel> categorylist,
   }) async {
-      Map<String, String>? postheaders = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Bearer ${sharedPref.token}',
-  };
+    Map<String, String>? postheaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer ${sharedPref.token}',
+    };
     Ticket ticket = getTicket(categorylist);
-    final response =
-        await API.post(url: 'ticket/',headers: postheaders, context: context, body: ticketToJson([ticket]), logs: true);
+    final response = await API.post(
+        url: 'ticket/',
+        headers: postheaders,
+        context: context,
+        body: ticketToJson([ticket]),
+        logs: true);
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      List<PostTicketResponse> ticketResponse = postTicketResponseFromJson(response.body);
-      if (getRole() == "mys-parking") {
-        final pdfFile = await ParkingPdf.parkingBill(
-            ticketNumber: ticket.number,
-            dateTime: ticket.issuedTs,
-            qrImage: await toQrImageData(ticketResponse[0].uuid),
-            total: getTotalCategory(categorylist),
-            listCategory: categorylist);
+      try {
+        List<PostTicketResponse> ticketResponse = postTicketResponseFromJson(response.body);
+        if (categorylist[0].name == "Locker") {
+          log("locker");
+          await printticket(categorylist, ticket, ticketResponse);
+          await printticket(categorylist, ticket, ticketResponse);
+          return true;
+        }
 
-        final pdf = pdfFile.readAsBytes();
-        List<Printer> printerList = await Printing.listPrinters();
-        sharedPref.getPrinter.length > 2
-            ? await Printing.directPrintPdf(
-                printer:
-                    printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
-                onLayout: (_) => pdf)
-            : await Printing.layoutPdf(onLayout: (_) => pdf);
-        String path = await createFolderInAppDocDir("bills");
-        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+        await printticket(categorylist, ticket, ticketResponse);
         return true;
+      } catch (e) {
+        return false;
       }
-      if (categorylist[0].name == "Locker") {
-        log("locker");
-        final pdfFile = await PdfApi.zooBill(
-            listCategory: categorylist,
-            ticketNumber: ticket.number,
-            dateTime: ticket.issuedTs,
-            total: getTotalCategory(categorylist),
-            image: await toQrImageData(ticketResponse[0].uuid));
-        final pdf = pdfFile.readAsBytes();
-        List<Printer> printerList = await Printing.listPrinters();
-        sharedPref.getPrinter.length > 2
-            ? await Printing.directPrintPdf(
-                printer:
-                    printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
-                onLayout: (_) => pdf)
-            : await Printing.layoutPdf(onLayout: (_) => pdf);
-        sharedPref.getPrinter.length > 2
-            ? await Printing.directPrintPdf(
-                printer:
-                    printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
-                onLayout: (_) => pdf)
-            : await Printing.layoutPdf(onLayout: (_) => pdf);
-        String path = await createFolderInAppDocDir("bills");
-        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
-        return true;
-      }
-
-      final pdfFile = await PdfApi.zooBill(
-          listCategory: categorylist,
-          ticketNumber: ticket.number,
-          dateTime: ticket.issuedTs,
-          total: getTotalCategory(categorylist),
-          image: await toQrImageData(ticketResponse[0].uuid));
-      final pdf = pdfFile.readAsBytes();
-      List<Printer> printerList = await Printing.listPrinters();
-      sharedPref.getPrinter.length > 2
-          ? await Printing.directPrintPdf(
-              printer: printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
-              onLayout: (_) => pdf)
-          : await Printing.layoutPdf(onLayout: (_) => pdf);
-      String path = await createFolderInAppDocDir("bills");
-        //  PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
-      return true;
     } else {
       return false;
     }
+  }
+
+  Future<void> printticket(List<CategoryModel> categorylist, Ticket ticket,
+      List<PostTicketResponse> ticketResponse) async {
+    final pdfFile = await PdfApi.zooBill(
+        listCategory: categorylist,
+        ticketNumber: ticket.number,
+        dateTime: ticket.issuedTs,
+        total: getTotalCategory(categorylist),
+        image: await toQrImageData(ticketResponse[0].uuid));
+    final pdf = pdfFile.readAsBytes();
+    List<Printer> printerList = await Printing.listPrinters();
+    sharedPref.getPrinter.length > 2
+        ? await Printing.directPrintPdf(
+            format: PdfPageFormat.roll80,
+            printer: printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
+            onLayout: (_) => pdf)
+        : await Printing.layoutPdf(onLayout: (_) => pdf);
+    String path = await createFolderInAppDocDir("bills");
+   // PdfApi.openFile(pdfFile.renameSync('$path/${ticket.number}.pdf'));
+    
   }
 
   Future<bool> bottleScan({required BuildContext context, required String barcode}) async {

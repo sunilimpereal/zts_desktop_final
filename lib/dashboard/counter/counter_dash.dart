@@ -27,8 +27,6 @@ class _CounterDashState extends State<CounterDash> {
     const Color(0xff56282D),
     const Color(0xfffa824c),
     const Color(0xFFA8201A),
-    const Color(0xff008832),
-    const Color(0xff62b6cb),
     const Color(0xff3d348b),
     const Color(0xff56282D),
     const Color(0xfffa824c),
@@ -82,7 +80,8 @@ class _CounterDashState extends State<CounterDash> {
                       width: 400,
                       height: 80,
                       child: TicketDisplay(),
-                    ))
+                    )
+                    )
               ],
             ),
           );

@@ -12,6 +12,7 @@ import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticke
 import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/printer/bill_pdf.dart';
 import 'package:zts_counter_desktop/utils/shared_pref.dart';
+import 'package:flutter/services.dart';
 
 String getRole() {
   String yourToken = sharedPref.token ?? "";
@@ -46,7 +47,7 @@ printPdf({required File pdfFile, required Ticket ticket}) async {
           onLayout: (_) => pdf)
       : await Printing.layoutPdf(onLayout: (_) => pdf);
   String path = await createFolderInAppDocDir("bills");
-  // PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
+  //PdfApi.openFile(pdfFile.renameSync("$path/${ticket.number}.pdf"));
 }
 
 Future<Uint8List> toQrImageData(String text) async {
@@ -116,4 +117,21 @@ getTotalCategory(List<CategoryModel> list) {
     }
   }
   return sum;
+}
+
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
+  }
 }

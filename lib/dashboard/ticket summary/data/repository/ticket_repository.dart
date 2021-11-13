@@ -20,6 +20,7 @@ class TicketRepository {
         url:
             'ticket/?issued_ts__year=${date.year}&issued_ts__month=${date.month}&issued_ts__day=${date.day}${showonlyHour? "&issued_ts__hour=${date.hour}":""}',
         context: context,
+        logs: true,
         headers1: headers);
     if (response.statusCode == 200) {
       List<GeneratedTickets> ticketList = generatedTicketsFromJson(response.body);

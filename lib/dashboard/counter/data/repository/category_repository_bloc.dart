@@ -4,7 +4,9 @@ import 'package:rxdart/rxdart.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/sub_category_card.dart';
+import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/utils/bloc.dart';
+import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 class CategoryBloc extends Bloc {
   BuildContext context;
@@ -29,9 +31,12 @@ class CategoryBloc extends Bloc {
     _controller.sink.add(updatedList);
   }
 
-    bool updateCategorytZero(List<CategoryModel> updatedList)  {
-     _controller.sink.add(updatedList);
-     //to disable the loading button 
+  bool updateCategorytZero(List<CategoryModel> updatedList) {
+    sharedPrefs.setVehicleNumber(vehicleNumber: '');// sets vehicle number to none after printing
+    _selectedCategoryController.sink.add(updatedList[0]);
+    _controller.sink.add(updatedList);
+
+    //to disable the loading button
     return true;
   }
 

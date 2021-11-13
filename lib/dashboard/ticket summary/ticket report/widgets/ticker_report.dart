@@ -101,9 +101,9 @@ class _TicketReportState extends State<TicketReport> {
   }
 
   Widget data() {
-        final win = appWindow;
-        log("scale ${win.scaleFactor.toString()}");
-        
+    final win = appWindow;
+    log("scale ${win.scaleFactor.toString()}");
+
     return StreamBuilder<List<GeneratedTickets>>(
         stream: TicketProvider.of(context).ticketHistoryStream,
         builder: (context, snapshot) {
@@ -130,6 +130,13 @@ class _TicketReportState extends State<TicketReport> {
           height: 35,
           child: Row(
             children: [
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(100),
+                    color: e.isScanned ? Colors.green : Colors.red),
+              ),
               cell(flex: 4, text: '${e.number}', even: a.isEven),
               cell(
                   flex: 4,

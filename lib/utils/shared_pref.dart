@@ -15,6 +15,7 @@ class SharedPref {
   String get organizationName => _sharedPref!.getString('organizationName') ?? "";
   String get organizationLogo => _sharedPref!.getString('organizationLogo') ?? "";
   String get getPrinter => _sharedPref!.getString('printer') ?? "";
+  String get getVehicleNumber => _sharedPref!.getString('vehicleNumber') ?? "";
 
   String? get token => _sharedPref!.getString('authToken');
 
@@ -47,8 +48,12 @@ class SharedPref {
   setAuthToken({required String token}) {
     _sharedPref!.setString('authToken', token);
   }
+
     setPrinter({required String printer}) {
     _sharedPref!.setString('printer', printer);
+  }
+   setVehicleNumber({required String vehicleNumber}) {
+    _sharedPref!.setString('vehicleNumber', vehicleNumber);
   }
 }
 

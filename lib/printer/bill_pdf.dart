@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,8 +9,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/widgets.dart';
+import 'package:printing/printing.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/line_summary_model.dart';
+import 'package:zts_counter_desktop/main.dart';
 
 import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
@@ -47,16 +50,32 @@ class PdfApi {
     List<Category> lineList = getselectedLineItem(listCategory);
 
     int printlines = 0;
+
+    bool showNumber = false;
+    bool showTicketValidity = false;
     for (Category cat in lineList) {
       if (cat.name.toLowerCase().contains('student')) {
+        printlines = printlines + 2;
+      }
+      if (sharedPrefs.getVehicleNumber.length > 1 && cat.name.toLowerCase().contains("parking")) {
         printlines = printlines + 1;
+        showNumber = true;
+      }
+      if (cat.name.toLowerCase().contains("karanji entrance") ||
+          cat.name.toLowerCase().contains("parking")) {
+        showTicketValidity = true;
       }
       printlines = printlines + cat.dataList.length;
     }
     pdf.addPage(
       MultiPage(
+        orientation: pw.PageOrientation.natural,
         pageFormat: PdfPageFormat.roll80.copyWith(
-          height: 342 + (printlines * 38) + (listCategory.length * 80),
+          height: 340 +
+              (printlines * 30) +
+              (listCategory.length * 70) +
+              (showTicketValidity ? 20 : 0) +
+              (showNumber ? 20 : 0),
           marginLeft: 6 * PdfPageFormat.mm,
           marginRight: 6 * PdfPageFormat.mm,
         ),
@@ -65,9 +84,9 @@ class PdfApi {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               sharedPrefs.userEmail == 'karanji1@myszoo.com'
-                  ? pw.Container(height: 35, child: pw.Image(karanji))
+                  ? pw.Container(height: 33, child: pw.Image(karanji))
                   : pw.Container(height: 35, child: pw.Image(zootitle)),
-              pw.SizedBox(width: 4),
+              pw.SizedBox(width: 12),
             ],
           ),
           pw.SizedBox(height: 8),
@@ -79,6 +98,13 @@ class PdfApi {
             pw.SizedBox(height: 4),
             Pdftext(text: 'Time : ${DateFormat('dd/MM/yyyy kk:mm').format(time)}'),
             pw.SizedBox(height: 4),
+            showNumber
+                ? pw.Column(children: [
+                    Pdftext(text: 'Vehicle Number : ${sharedPref.getVehicleNumber}'),
+                    pw.SizedBox(height: 4),
+                  ])
+                : pw.SizedBox(),
+
             // tableleHeader(),
 
             pw.Column(children: lineList.map((e) => lineItem(e)).toList()),
@@ -101,7 +127,13 @@ class PdfApi {
             pw.Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               pw.Container(width: 200, height: 80, child: pw.Image(qrcode, fit: pw.BoxFit.contain)),
             ]),
-            pw.SizedBox(width: 8, height: 16),
+            pw.SizedBox(width: 8, height: 8),
+            showTicketValidity
+                ? pw.Column(children: [
+                    Pdftext(text: 'Valid for 4 Hours,Overstay will be charged.'),
+                    pw.SizedBox(width: 8, height: 8),
+                  ])
+                : pw.SizedBox(),
             Pdftext(text: 'THANK YOU VISIT AGAIN...'),
             Pdftext(text: 'LOVE AND PROTECT ANIMALS...'),
             pw.SizedBox(height: 3),
@@ -119,8 +151,19 @@ class PdfApi {
         ],
       ),
     );
+    return saveDocument(name: 'bin.acc', pdf: pdf);
+    
+    
 
-    return saveDocument(name: 'zooBill.pdf', pdf: pdf);
+    
+    
+    
+    
+    
+    
+    
+    
+
   }
 
   static List<Category> getselectedLineItem(List<CategoryModel> list) {
@@ -177,7 +220,7 @@ class PdfApi {
   static Widget lineItem(Category dataList) {
     return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
       pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(vertical: 8),
+        padding: const pw.EdgeInsets.only(top: 6, bottom: 4),
         child: Pdftext(
             text: dataList.name, fontSize: 14, heightPadding: 2, fontWeight: FontWeight.bold),
       ),
@@ -194,9 +237,8 @@ class PdfApi {
       Table.fromTextArray(
         headers: headerList,
         data: data,
-
         border: const TableBorder(bottom: BorderSide(width: 0.3), top: BorderSide(width: 0.3)),
-        headerStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        headerStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
         headerDecoration: const pw.BoxDecoration(
           border: pw.Border(
             bottom: pw.BorderSide(
@@ -204,6 +246,9 @@ class PdfApi {
             ),
           ),
         ),
+
+        headerPadding: pw.EdgeInsets.symmetric(vertical: 0, horizontal: 6.5),
+        cellPadding: pw.EdgeInsets.symmetric(vertical: 3.5, horizontal: 5),
         cellStyle: TextStyle(fontSize: 12),
         // headerDecoration: BoxDecoration(color: PdfColors.grey300),
         cellHeight: 1,
@@ -211,7 +256,8 @@ class PdfApi {
         columnWidths: {
           0: FlexColumnWidth(4),
           1: FlexColumnWidth(3),
-          2: FlexColumnWidth(2.5),
+          2: FlexColumnWidth(2),
+          2: FlexColumnWidth(3),
         },
         cellAlignments: {
           0: Alignment.centerLeft,
@@ -277,25 +323,21 @@ class PdfApi {
     final karanji =
         pw.MemoryImage((await rootBundle.load('assets/images/karanji.png')).buffer.asUint8List());
 
-
-        double getLength(){
-           double length = 0;
-           for(LineSumryItem lineItem in linesItems){
-             if('${lineItem.subcategory} ${lineItem.type}'.length > 15){
-               length =length +32; 
-
-             }else{
-               length = length +25;
-             }
-           }
-           return length;
-             
-   
- }
+    double getLength() {
+      double length = 0;
+      for (LineSumryItem lineItem in linesItems) {
+        if ('${lineItem.subcategory} ${lineItem.type}'.length > 15) {
+          length = length + 32;
+        } else {
+          length = length + 25;
+        }
+      }
+      return length;
+    }
 
     pdf.addPage(MultiPage(
         pageFormat: PdfPageFormat.roll80.copyWith(
-          height: 300 +30 +20 + getLength(),
+          height: 300 + 30 + 20 + getLength(),
           marginTop: 2 * PdfPageFormat.mm,
           marginLeft: 6 * PdfPageFormat.mm,
           marginRight: 6 * PdfPageFormat.mm,
@@ -328,7 +370,7 @@ class PdfApi {
                         heightPadding: 2),
                     Pdftext(text: 'User : $userEmail', fontSize: 12, heightPadding: 4),
                     Pdftext(
-                        text: "Summary Date : ${DateFormat('dd/MM/yyyy hh:mm').format(dateTime)}",
+                        text: "Summary Date : ${DateFormat('dd/MM/yyyy').format(dateTime)}",
                         fontSize: 12,
                         heightPadding: 4),
                     Pdftext(
@@ -381,9 +423,8 @@ class PdfApi {
                   ]),
             ]));
 
-    return saveDocument(name: 'BillSummary.pdf', pdf: pdf);
+    return saveDocument(name: 'bin.acc', pdf: pdf);
   }
-
 
   static Widget zooSummaryInvoice(List<SummaryTableRowDataPDF> dataList) {
     double billtotal = 0;

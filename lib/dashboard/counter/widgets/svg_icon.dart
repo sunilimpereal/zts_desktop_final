@@ -39,17 +39,25 @@ class _SvgIconState extends State<SvgIcon> {
 
   @override
   Widget build(BuildContext context) {
-    return network
-        ? SvgPicture.network('${config.ICON_ROOT}${widget.path}', color: widget.color,
-            placeholderBuilder: (context) {
-            return SvgPicture.asset(
-              'assets/icons/Default.svg',
-              color: widget.color,
-            );
-          })
-        : SvgPicture.asset(
-            'assets/icons/${widget.path}',
-            color: widget.color,
-          );
+    return FutureBuilder<bool>(
+        future: hasNetwork(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) return Container();
+          return snapshot.data ?? false
+              ? SvgPicture.network('${config.ICON_ROOT}${widget.path}', color: widget.color,
+                  placeholderBuilder: (context) {
+                  return SvgPicture.asset(
+                    'assets/icons/Default.svg',
+                    color: widget.color,
+                  );
+                })
+              : SvgPicture.asset('assets/icons/${widget.path}', color: widget.color,
+                  placeholderBuilder: (context) {
+                  return SvgPicture.asset(
+                    'assets/icons/Default.svg',
+                    color: widget.color,
+                  );
+                });
+        });
   }
 }

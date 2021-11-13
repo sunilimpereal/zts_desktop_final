@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:advance_notification/advance_notification.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:printing/printing.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
@@ -12,6 +13,7 @@ import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/t
 import 'package:zts_counter_desktop/main.dart';
 import 'package:zts_counter_desktop/printer/bill_pdf.dart';
 import 'package:zts_counter_desktop/utils/methods.dart';
+import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 class TicketSummaryCard extends StatefulWidget {
   const TicketSummaryCard({Key? key}) : super(key: key);
@@ -22,6 +24,8 @@ class TicketSummaryCard extends StatefulWidget {
 
 class _TicketSummaryCardState extends State<TicketSummaryCard> {
   bool loadingPrintButton = false;
+  FocusNode vehicleNumberFocus = FocusNode();
+  TextEditingController vehicleNumberController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -65,12 +69,92 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
               Positioned(
                 bottom: 0,
                 child: Container(
-                  height: 150,
+                  height: 220,
                   width: MediaQuery.of(context).size.width * 0.24,
                   color: Colors.white.withOpacity(0.9),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      StreamBuilder<CategoryModel>(
+                          stream: CategoryProvider.of(context).selectedcategoryStream,
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) return Container();
+                            if (snapshot.data!.name.toLowerCase().contains('parking')) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                  // Text("Vechile Number: "),
+                                  Container(
+                                    height: 50,
+                                    width: MediaQuery.of(context).size.width * 0.22,
+                                    decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                                      border: Border.all(
+                                          width: 2,
+                                          color: vehicleNumberFocus.hasFocus
+                                              ? Theme.of(context).colorScheme.primary
+                                              : Colors.transparent),
+                                    ),
+                                    child: Material(
+                                      elevation: vehicleNumberFocus.hasFocus ? 0 : 0,
+                                      color: Theme.of(context).colorScheme.background,
+                                      shape: appStyles.shapeBorder(5),
+                                      shadowColor: Colors.grey[100],
+                                      child: Container(
+                                        // width: MediaQuery.of(context).size.width * 0.7,
+                                        alignment: Alignment.center,
+                                        margin: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: TextFormField(
+                                          controller: vehicleNumberController,
+                                          focusNode: vehicleNumberFocus,
+                                          textAlign: TextAlign.left,
+                                          obscureText: false,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Theme.of(context).textTheme.headline1!.color,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          onTap: () {},
+                                          onChanged: (value) {
+                                            // vehicleNumberController.text = value.toUpperCase();
+                                            sharedPrefs.setVehicleNumber(vehicleNumber: value);
+                                          },
+                                          inputFormatters: [
+                                            UpperCaseTextFormatter(),
+                                          ],
+                                          decoration: InputDecoration(
+                                            // errorText: "${snapshot.error}",
+                                            border: InputBorder.none,
+                                            contentPadding: const EdgeInsets.only(
+                                                left: 0, right: 10, top: 10, bottom: 10),
+                                            hintText: "Vehicle Number",
+                                            prefixIconConstraints:
+                                                const BoxConstraints(minWidth: 23, maxHeight: 20),
+                                            labelText: "Vehicle Number",
+                                            isDense: false,
+                                            hintStyle: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .headline1!
+                                                    .color
+                                                    ?.withOpacity(0.2),
+                                                fontSize: 16),
+                                            labelStyle: TextStyle(
+                                              height: 0.6,
+                                              fontSize: 16,
+                                              color: Theme.of(context).textTheme.headline1!.color,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ]),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          }),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
                         child: Row(
@@ -127,81 +211,71 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                                             setState(() {
                                               loadingPrintButton = true;
                                             });
+                                            if (await hasNetwork()) {
+                                              createFolderInAppDocDir('bills');
+                                              log(getTotalCategory(snapshot.data ?? []).toString());
+                                              if ((getTotalCategory(snapshot.data ?? []) != 0)) {
+                                                CategoryRepository categoryRepository =
+                                                    CategoryRepository();
+                                                List<CategoryModel> categorylist =
+                                                    snapshot.data ?? [];
+                                                log(categorylist.toString());
+                                                List<CategoryModel> filterCategorylist = [];
 
-                                            createFolderInAppDocDir('bills');
-                                            log(getTotalCategory(snapshot.data ?? []).toString());
-                                            if ((getTotalCategory(snapshot.data ?? []) != 0)) {
-                                              CategoryRepository categoryRepository =
-                                                  CategoryRepository();
-                                              List<CategoryModel> categorylist =
-                                                  snapshot.data ?? [];
-                                              log(categorylist.toString());
-                                              List<CategoryModel> filterCategorylist = [];
+                                                for (CategoryModel category in categorylist) {
+                                                  if (category.categoryQyantity != 0) {
+                                                    if (category.name.contains('Parking')) {
+                                                      await categoryRepository.generateTicket(
+                                                          context: context,
+                                                          categorylist: [category]).then((value) {
+                                                        log(value.toString());
+                                                      });
+                                                      continue;
+                                                    }
+                                                    if (category.name.contains('Locker')) {
+                                                      await categoryRepository.generateTicket(
+                                                          context: context,
+                                                          categorylist: [category]).then((value) {
+                                                        log(value.toString());
+                                                      });
+                                                      continue;
+                                                    }
+                                                    if (category.name
+                                                        .contains('Battery Operated Vehicle')) {
+                                                      await categoryRepository.generateTicket(
+                                                          context: context,
+                                                          categorylist: [category]).then((value) {
+                                                        log(value.toString());
+                                                      });
+                                                      continue;
+                                                    }
 
-                                              for (CategoryModel category in categorylist) {
-                                                if (category.categoryQyantity != 0) {
-                                                  if (category.name.contains('Parking')) {
-                                                    await categoryRepository.generateTicket(
-                                                        context: context,
-                                                        categorylist: [category]).then((value) {
-                                                      log(value.toString());
-                                                    });
-                                                    continue;
+                                                    filterCategorylist.add(category);
                                                   }
-                                                  if (category.name.contains('Locker')) {
-                                                    await categoryRepository.generateTicket(
-                                                        context: context,
-                                                        categorylist: [category]).then((value) {
-                                                      log(value.toString());
-                                                    });
-                                                    continue;
-                                                  }
-                                                  if (category.name
-                                                      .contains('Battery Operated Vehicle')) {
-                                                    await categoryRepository.generateTicket(
-                                                        context: context,
-                                                        categorylist: [category]).then((value) {
-                                                      log(value.toString());
-                                                    });
-                                                    continue;
-                                                  }
-
-                                                  filterCategorylist.add(category);
                                                 }
+                                                filterCategorylist.isNotEmpty
+                                                    ? await categoryRepository
+                                                        .generateTicket(
+                                                            context: context,
+                                                            categorylist: filterCategorylist)
+                                                        .then((value) {
+                                                        log(value.toString());
+                                                      })
+                                                    : null;
+                                                setState(() {
+                                                  vehicleNumberController.clear();
+                                                  log('message loading');
+                                                  loadingPrintButton = !CategoryProvider.of(context)
+                                                      .updateCategorytZero(convertCategorytoZero(
+                                                          snapshot.data ?? []));
+                                                });
+                                                TicketProvider.of(context).getRecentTickets();
+                                              } else {
+                                                setState(() {
+                                                  loadingPrintButton = false;
+                                                });
                                               }
-                                            filterCategorylist.isNotEmpty?  await categoryRepository
-                                                  .generateTicket(
-                                                      context: context,
-                                                      categorylist: filterCategorylist)
-                                                  .then((value) {
-                                                log(value.toString());
-                                              }):null;
-                                              setState(() {
-                                                log('message loading');
-                                                loadingPrintButton = !CategoryProvider.of(context)
-                                                    .updateCategorytZero(
-                                                        convertCategorytoZero(snapshot.data ?? []));
-                                              });
-                                              // CategoryProvider.of(context)
-                                              //     .getCategoryList()
-                                              //     .then((value) {
-                                              //   setState(() {
-                                              //     loadingPrintButton = value ? false : true;
-                                              //   });
-                                              // });
-                                              TicketProvider.of(context).getRecentTickets();
                                             } else {
-                                              // AdvanceSnackBar(
-                                              //   message: 'Notification Message',
-                                              //   mode: 'B',
-                                              //   duration: Duration(seconds: 5),
-                                              //   child: Container(
-                                              //     height: 50,
-                                              //     width: 50,
-                                              //     color: Colors.red,
-                                              //   )
-
-                                              // ).show(context);
                                               setState(() {
                                                 loadingPrintButton = false;
                                               });
@@ -231,6 +305,9 @@ class _TicketSummaryCardState extends State<TicketSummaryCard> {
                     ],
                   ),
                 ),
+              
+              
+              
               )
             ],
           ),
