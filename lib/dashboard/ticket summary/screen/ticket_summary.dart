@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zts_counter_desktop/dashboard/ticket%20summary/ticket%20report/widgets/ticker_report.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/ticket%20report/widgets/ticket_report.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/widgets/ticket_history_table.dart';
 
 class TicketSummaryScreen extends StatefulWidget {
@@ -17,10 +17,12 @@ class _TicketSummaryScreenState extends State<TicketSummaryScreen> {
         padding: const EdgeInsets.all(8),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children:  [
-           const TicketHistoryTable(),
-            SizedBox(width: MediaQuery.of(context).size.width*0.1,),
-           const TicketReport()
+          children: [
+            const TicketHistoryTable(),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.1,
+            ),
+            const TicketReport()
           ],
         ),
       ),

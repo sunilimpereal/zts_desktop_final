@@ -5,6 +5,7 @@ import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart'
 import 'package:zts_counter_desktop/dashboard/counter/data/models/generated_tickets.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/line_summary_model.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket_report_model.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_repository.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/sub_category_card.dart';
 import 'package:zts_counter_desktop/utils/bloc.dart';
@@ -12,36 +13,47 @@ import 'package:zts_counter_desktop/utils/bloc.dart';
 class RecentTicketBloc extends Bloc {
   BuildContext context;
   RecentTicketBloc(this.context) {
+    _ticektReportLoadingController.sink.add(true);
     getRecentTickets();
-    getTicketHistory();
+    getTicketReport();
     getLineItemSumry(DateTime.now());
   }
   final _recentTicektcontroller = BehaviorSubject<List<GeneratedTickets>>();
-  final _ticektHistorycontroller = BehaviorSubject<List<GeneratedTickets>>();
+  final _ticektReportcontroller = BehaviorSubject<List<TicketReportItem>>();
+  final _ticektReportLoadingController = BehaviorSubject<bool>();
   final _lineItemSumrycontroller = BehaviorSubject<List<LineSumryItem>>();
   DateTime selectedDate = DateTime.now();
+  DateTime ticketReportselectedDate = DateTime.now();
+  bool ticketReportisHour = true;
   Stream<List<GeneratedTickets>> get recentTicketStream =>
       _recentTicektcontroller.stream.asBroadcastStream();
-  Stream<List<GeneratedTickets>> get ticketHistoryStream =>
-      _ticektHistorycontroller.stream.asBroadcastStream();
-        Stream<List<LineSumryItem>> get lineItemSummary =>
+  Stream<List<TicketReportItem>> get ticketReportStream =>
+      _ticektReportcontroller.stream.asBroadcastStream();
+  Stream<bool> get ticketReportLoadingStream =>
+      _ticektReportLoadingController.stream.asBroadcastStream();
+  Stream<List<LineSumryItem>> get lineItemSummary =>
       _lineItemSumrycontroller.stream.asBroadcastStream();
 
   void getRecentTickets() async {
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getRecentTickets(context:context,showonlyHour: true);
+    final result = await ticketRepository.getRecentTickets(context: context, showonlyHour: true);
     _recentTicektcontroller.sink.add(result);
   }
 
-  void getTicketHistory() async {
+  Future<List<TicketReportItem>> getTicketReport({bool? showonlyHour}) async {
+    ticketReportisHour = showonlyHour ?? true;
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getRecentTickets(context:context,showonlyHour: false);
-    _ticektHistorycontroller.sink.add(result);
+    _ticektReportLoadingController.sink.add(true);
+    final result = await ticketRepository.getTicketReport(
+        context: context, showonlyHour: showonlyHour ?? true);
+    _ticektReportLoadingController.sink.add(false);
+    _ticektReportcontroller.sink.add(result);
+    return result;
   }
 
-    void getLineItemSumry(DateTime date) async {
+  void getLineItemSumry(DateTime date) async {
     TicketRepository ticketRepository = TicketRepository();
-    final result = await ticketRepository.getFiletredLineItems(context,date);
+    final result = await ticketRepository.getFiletredLineItems(context, date);
     selectedDate = date;
     _lineItemSumrycontroller.sink.add(result);
   }
@@ -49,7 +61,7 @@ class RecentTicketBloc extends Bloc {
   @override
   void dispose() {
     _recentTicektcontroller.close();
-    _ticektHistorycontroller.close();
+    _ticektReportcontroller.close();
   }
 }
 

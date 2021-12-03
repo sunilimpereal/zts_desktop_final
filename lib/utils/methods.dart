@@ -119,15 +119,29 @@ getTotalCategory(List<CategoryModel> list) {
   return sum;
 }
 
-  Future<bool> hasNetwork() async {
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException catch (_) {
-      return false;
+getCurrentDateTime(DateTime date) {
+  DateTime newDate = date;
+  return newDate.add(const Duration(hours: 5, minutes: 30));
+}
+
+cleanQr(String qr) {
+  String output = "";
+  for (int i = 0; i < qr.length; i++) {
+    if (RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(qr[i])) {
+      output = output + qr[i];
     }
   }
+  return output;
+}
 
+Future<bool> hasNetwork() async {
+  try {
+    final result = await InternetAddress.lookup('example.com');
+    return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+  } on SocketException catch (_) {
+    return false;
+  }
+}
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override

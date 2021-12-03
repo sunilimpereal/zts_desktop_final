@@ -159,7 +159,8 @@ class _DashboardState extends State<Dashboard> {
                   width: 130,
                   ontap: () {
                     TicketProvider.of(context).getLineItemSumry(DateTime.now());
-                    TicketProvider.of(context).getTicketHistory();
+                    TicketProvider.of(context).getTicketReport();
+                    TicketProvider.of(context).getRecentTickets();
                     changeScreen(Screens.tickets);
                   },
                   selected: selectedScreen == Screens.tickets,
@@ -194,10 +195,7 @@ class _DashboardState extends State<Dashboard> {
                   height: 40,
                   width: 100,
                   decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("assets/images/logo.png")
-                    )
-                  ),
+                      image: DecorationImage(image: AssetImage("assets/images/logo.png"))),
                 )
               ],
             )

@@ -34,7 +34,7 @@ class _BottleViewState extends State<BottleView> {
   @override
   Widget build(BuildContext context) {
     if (scannedResult != 0) {
-      Future.delayed(Duration(seconds: 5)).then((value) {
+      Future.delayed(Duration(seconds: 1, milliseconds: 500)).then((value) {
         setState(() {
           scannedResult = 0;
         });
@@ -87,7 +87,7 @@ class _BottleViewState extends State<BottleView> {
                         width: 200,
                         child: ElevatedButton(
                           onPressed: () {
-                            barcodeScan(context: context, barcode: barCode, clear: clear);
+                            barcodeScan(context: context, barcode: barCode.trim(), clear: clear);
                           },
                           child: const Text(
                             'Scan',
@@ -145,7 +145,7 @@ class _BottleViewState extends State<BottleView> {
               });
             },
             onFieldSubmitted: (value) async {
-              barcodeScan(context: context, barcode: barCode, clear: clear);
+              barcodeScan(context: context, barcode: barCode.trim(), clear: clear);
             },
             decoration: InputDecoration(
               // errorText: "${snapshot.error}",
@@ -187,7 +187,7 @@ class _BottleViewState extends State<BottleView> {
             ),
           ),
           Text(
-            scannedResult == 1 ? 'Bottle Scanned' : 'Bottle already Scanned',
+            scannedResult == 1 ? 'Bottle Scanned' : 'Invalid Barcode',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -214,11 +214,13 @@ class _BottleViewState extends State<BottleView> {
         setState(() {
           loading = false;
           scannedResult = 1;
+          clear();
         });
       } else {
         setState(() {
           loading = false;
           scannedResult = 2;
+          clear();
         });
       }
     });

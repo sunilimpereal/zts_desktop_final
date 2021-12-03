@@ -60,4 +60,26 @@ class API {
       //TODO : Dialog box
     }
   }
+    static Future<Response> patch({
+    required String url,
+    required Object body,
+    required BuildContext context,
+    Map<String, String>? headers,
+    bool? logs
+  }) async {
+    try {
+      logs??false?  log('url: ${config.API_ROOT + url} '):null;
+      logs??false? log('body: $body'):null;
+      var response = await http.patch(Uri.parse(config.API_ROOT + url),
+          body: body, headers: headers ?? postheaders);
+      logs??false?log('respose: ${response.statusCode}'):null;
+      logs??false?log('respose: ${response.body}'):null;
+      if (response.statusCode == 401) {
+        CheckLoginProvider.of(context)?.logout();
+      }
+      return response;
+    } finally {
+      //TODO : Dialog box
+    }
+  }
 }

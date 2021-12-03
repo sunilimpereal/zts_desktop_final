@@ -23,19 +23,14 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget> {
   updateTime() {
     Timer.periodic(Duration(seconds: 2), (timer) {
       hasNetwork().then((value) {
-        try{
-        setState(() {
-          networkStatus = value;
-        });
-        }catch(e){
-
-        }
+        try {
+          setState(() {
+            networkStatus = value;
+          });
+        } catch (e) {}
       });
-     
     });
   }
-
-
 
   bool networkStatus = false;
   @override
@@ -47,24 +42,32 @@ class _NetworkStatusWidgetState extends State<NetworkStatusWidget> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text( DateFormat().add_Hm().addPattern(" ").add_yMEd().format(DateTime.now())),
+              Text(DateFormat()
+                  .add_Hm()
+                  .addPattern(" ")
+                  .addPattern("dd/MM/yyyy")
+                  .format(DateTime.now())),
             ],
           ),
         ),
-        SizedBox(width: 24,),
+        SizedBox(
+          width: 24,
+        ),
         Container(
           height: 45,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon( networkStatus?Icons.network_wifi:Icons.wifi_off ,color: networkStatus?Colors.green:Colors.red,),
+              Icon(
+                networkStatus ? Icons.network_wifi : Icons.wifi_off,
+                color: networkStatus ? Colors.green : Colors.red,
+              ),
               const SizedBox(width: 8),
-              Text( networkStatus? 'Online':'Offline'),
+              Text(networkStatus ? 'Online' : 'Offline'),
             ],
           ),
         ),
       ],
     );
   }
-
 }

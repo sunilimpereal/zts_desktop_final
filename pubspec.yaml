@@ -8,7 +8,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.15.0-178.0.dev <3.0.0"
+  sdk: ">=2.15.0-116.0.dev <3.0.0"
 
 dependencies:
   flutter:
@@ -47,6 +47,8 @@ dependencies:
   printing: ^5.6.0
   qr_flutter: ^4.0.0
   jwt_decoder: ^2.0.1
+  #excel
+  syncfusion_flutter_xlsio: ^19.3.54-beta
 
   #datepicker
   syncfusion_flutter_datepicker: ^19.3.48
@@ -71,6 +73,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  msix: ^2.6.3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -120,3 +123,13 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+msix_config:
+  display_name: ZTS
+  publisher_display_name: Aves Infotech
+  identity_name: aves.desktop.zts
+  msix_version: 1.2.6.0
+  logo_path: D:\c\Projects\zoo\zts-desktop\zts_counter_desktop\assets\images\logo.png
+  capabilities: 'internetClient,location,microphone,webcam'
+  certificate_path: C:\Users\sunil\certificates\CERTIFICATE.pfx
+  certificate_password: sunilhari496

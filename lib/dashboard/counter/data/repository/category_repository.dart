@@ -89,22 +89,20 @@ class CategoryRepository {
             printer: printerList.firstWhere((element) => element.name == sharedPrefs.getPrinter),
             onLayout: (_) => pdf)
         : await Printing.layoutPdf(onLayout: (_) => pdf);
-    String path = await createFolderInAppDocDir("bills");
-   // PdfApi.openFile(pdfFile.renameSync('$path/${ticket.number}.pdf'));
-    
+    // String path = await createFolderInAppDocDir("bills");
+    //PdfApi.openFile(pdfFile.renameSync('$path/${ticket.number}.pdf'));
   }
 
   Future<bool> bottleScan({required BuildContext context, required String barcode}) async {
-    //  final response =
-    //     await API.post(url: 'ticket/', context: context, body: ticketToJson([ticket]), logs: true);
-    bool a = await Future.delayed(const Duration(seconds: 1)).then((value) {
-      if (barcode == '11111') {
-        return true;
-      } else {
-        return false;
-      }
-    });
-
-    return a;
+    final response = await API.patch(
+        url: 'bottle-qr-code/$barcode/',
+        context: context,
+        body: '{"is_scanned": true}',
+        logs: true);
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

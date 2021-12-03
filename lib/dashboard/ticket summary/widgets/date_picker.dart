@@ -7,7 +7,8 @@ import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/line_
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 
 class ZTSDatePicker extends StatefulWidget {
-  const ZTSDatePicker({Key? key}) : super(key: key);
+  final Function(dynamic) onSelectionChanged;
+  const ZTSDatePicker({Key? key, required this.onSelectionChanged}) : super(key: key);
 
   @override
   _ZTSDatePickerState createState() => _ZTSDatePickerState();
@@ -33,7 +34,7 @@ class _ZTSDatePickerState extends State<ZTSDatePicker> {
           child: Stack(
             children: [
               Positioned(
-                width:  MediaQuery.of(context).size.width*0.3,
+                width: MediaQuery.of(context).size.width * 0.3,
                 child: CompositedTransformFollower(
                     link: layerLink,
                     offset: Offset(0, size.height),
@@ -59,14 +60,14 @@ class _ZTSDatePickerState extends State<ZTSDatePicker> {
       shadowColor: Colors.white,
       child: Container(
           child: Container(
-        height: MediaQuery.of(context).size.height*0.4,
-        width: MediaQuery.of(context).size.width*0.3,
+        height: MediaQuery.of(context).size.height * 0.4,
+        width: MediaQuery.of(context).size.width * 0.3,
         color: Colors.white,
         child: SfDateRangePicker(
           onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
             setState(() {
               hideOverlay();
-              TicketProvider.of(context).getLineItemSumry(args.value);
+              widget.onSelectionChanged(args.value);
             });
           },
           selectionColor: Colors.green,
@@ -85,15 +86,14 @@ class _ZTSDatePickerState extends State<ZTSDatePicker> {
     return CompositedTransformTarget(
         link: layerLink,
         child: StreamBuilder<List<LineSumryItem>>(
-          stream: TicketProvider.of(context).lineItemSummary,
-          builder: (context, snapshot) {
-            return TextButton(
-                onFocusChange: (value) {},
-                onPressed: () {
-                  showOverlay();
-                },
-                child: Text(DateFormat.yMMMEd().format(TicketProvider.of(context).selectedDate)));
-          }
-        ));
+            stream: TicketProvider.of(context).lineItemSummary,
+            builder: (context, snapshot) {
+              return TextButton(
+                  
+                  onPressed: () {
+                    showOverlay();
+                  },
+                  child: Text(DateFormat.yMMMEd().format(TicketProvider.of(context).selectedDate)));
+            }));
   }
 }
