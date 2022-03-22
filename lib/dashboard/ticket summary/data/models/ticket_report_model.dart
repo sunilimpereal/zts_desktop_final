@@ -27,6 +27,7 @@ class TicketReportItem {
     required this.isScanned,
     required this.createdTs,
     required this.modifiedTs,
+    required this.fine,
   });
 
   int id;
@@ -42,10 +43,12 @@ class TicketReportItem {
   bool isScanned;
   DateTime createdTs;
   DateTime modifiedTs;
+  double fine;
 
   factory TicketReportItem.fromJson(Map<String, dynamic> json) => TicketReportItem(
         id: json['id'],
         number: json['number'],
+        fine: json['fine'],
         organization: json['organization'],
         userEmail: json['user_email'],
         organizationName: json['organization_name'],

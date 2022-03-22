@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository.dart';
@@ -41,9 +42,24 @@ class _BottleViewState extends State<BottleView> {
       });
     }
     return Expanded(
+        child: RawKeyboardListener(
+      focusNode: FocusNode(),
+      autofocus: true,
+      onKey: (event) {
+        if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
+          log("enter Pressed");
+           barcodeScan(context: context, barcode: _textController.text, clear: clear);
+        } else if (event.isKeyPressed(LogicalKeyboardKey.tab)) {
+        } else {
+          if (event.character != null || !event.isKeyPressed(LogicalKeyboardKey.enter)) {
+            log("event : " + event.data.keyLabel);
+             _textController.text = _textController.text + cleanBarCode( event.data.keyLabel); 
+          }
+        }
+      },
       child: Container(
         height: MediaQuery.of(context).size.height - 80,
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
             gradient: LinearGradient(
                 end: Alignment.topCenter,
@@ -87,7 +103,7 @@ class _BottleViewState extends State<BottleView> {
                         width: 200,
                         child: ElevatedButton(
                           onPressed: () {
-                            barcodeScan(context: context, barcode: barCode.trim(), clear: clear);
+                            barcodeScan(context: context, barcode: _textController.text, clear: clear);
                           },
                           child: const Text(
                             'Scan',
@@ -104,7 +120,7 @@ class _BottleViewState extends State<BottleView> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget textfield(BuildContext context) {
@@ -135,6 +151,7 @@ class _BottleViewState extends State<BottleView> {
               fontWeight: FontWeight.w600,
             ),
             onTap: () {},
+            readOnly: true,
             showCursor: false,
             controller: _textController,
             focusNode: _textNode,
@@ -153,6 +170,12 @@ class _BottleViewState extends State<BottleView> {
               contentPadding: const EdgeInsets.only(left: 0, right: 10, top: 10, bottom: 10),
               prefixIconConstraints: const BoxConstraints(minWidth: 23, maxHeight: 20),
               isDense: false,
+              suffixIcon: IconButton(onPressed: (){
+                setState(() {
+                  _textController.clear();
+                });
+
+              }, icon:const Icon( Icons.close)),
               hintStyle:
                   TextStyle(color: Theme.of(context).textTheme.headline1!.color, fontSize: 16),
               labelStyle: TextStyle(
@@ -225,4 +248,20 @@ class _BottleViewState extends State<BottleView> {
       }
     });
   }
+}
+
+
+String cleanBarCode(String barcode){
+  String newBarcode = barcode;
+         newBarcode = newBarcode.replaceAll('!', '1');
+         newBarcode = newBarcode.replaceAll('@', '2');
+         newBarcode = newBarcode.replaceAll('#', '3');
+         newBarcode = newBarcode.replaceAll('\$', '4');
+         newBarcode = newBarcode.replaceAll('%', '5');
+         newBarcode = newBarcode.replaceAll('^', '6');
+         newBarcode = newBarcode.replaceAll('&', '7');
+         newBarcode = newBarcode.replaceAll('*', '8');
+         newBarcode = newBarcode.replaceAll('(', '9');
+  newBarcode=newBarcode.replaceAll(')', '0');
+  return newBarcode.toUpperCase();
 }

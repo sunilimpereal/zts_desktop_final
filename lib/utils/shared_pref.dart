@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPref {
@@ -16,9 +19,18 @@ class SharedPref {
   String get organizationLogo => _sharedPref!.getString('organizationLogo') ?? "";
   String get getPrinter => _sharedPref!.getString('printer') ?? "";
   String get getVehicleNumber => _sharedPref!.getString('vehicleNumber') ?? "";
+  String get getbaseUrl => _sharedPref!.getString('baseUrl') ?? 'http://awszts.afroaves.com:8080/';
+  String get getTicketCode => _sharedPref!.getString('ticketCode') ?? 'MYS';
+  String get getbottleCode => _sharedPref!.getString('bottleCode') ?? 'ABC';
+  String get getbottleStart => _sharedPref!.getString('bottleStart') ?? '0';
+  String get getbottleEnd => _sharedPref!.getString('bottleEnd') ?? '0';
+  String get todayDate =>
+      _sharedPref!.getString('todayDate') ??
+      "${DateFormat().addPattern("dd-MM-yyyy").format(DateTime.now())}";
+  List<String> get bottleQrCodes => _sharedPref!.getStringList("bottle") ?? [];
 
   String? get token => _sharedPref!.getString('authToken');
-
+//http://awszts.afroaves.com:8080/api/v1/
   ///Set as logged in
   setLoggedIn() {
     _sharedPref!.setBool('loggedIn', true);
@@ -27,6 +39,33 @@ class SharedPref {
   /// Set as logged out
   setLoggedOut() {
     _sharedPref!.setBool('loggedIn', false);
+    setAuthToken(token: "");
+    // _sharedPref!.remove('authToken');
+  }
+
+  isToday() {
+    log("date ${sharedPrefs.todayDate}");
+    if (sharedPrefs.todayDate ==
+        DateFormat().addPattern("dd-MM-yyyy").format(DateTime.now())) {
+      return true;
+    } else {
+        log("date ");
+      _sharedPref!.setStringList('bottle', []);
+      setTodayDate();
+      return true;
+    }
+  }
+
+  addBottletoList(String qrCode) {
+    List<String> list = bottleQrCodes;
+    list.add(qrCode);
+    _sharedPref?.setStringList('bottle', list);
+    log("bottle list:" + bottleQrCodes.toString());
+  }
+
+  setTodayDate() {
+    _sharedPref!
+        .setString('todayDate', '${DateFormat().addPattern("dd-MM-yyyy").format(DateTime.now())}');
     setAuthToken(token: "");
     // _sharedPref!.remove('authToken');
   }
@@ -49,11 +88,27 @@ class SharedPref {
     _sharedPref!.setString('authToken', token);
   }
 
-    setPrinter({required String printer}) {
+  setPrinter({required String printer}) {
     _sharedPref!.setString('printer', printer);
   }
-   setVehicleNumber({required String vehicleNumber}) {
+
+  setVehicleNumber({required String vehicleNumber}) {
     _sharedPref!.setString('vehicleNumber', vehicleNumber);
+  }
+
+  setbaseUrl({required String baseUrl}) {
+    _sharedPref!.setString('baseUrl', baseUrl);
+  }
+
+  setTicketCode({required String baseUrl}) {
+    _sharedPref!.setString('ticketCode', baseUrl);
+  }
+
+  setBarCode({required String bottleCode, required String start, required String end}) {
+    _sharedPref!.setString('bottleCode', bottleCode);
+    _sharedPref!.setString('bottleStart', start);
+    _sharedPref!.setString('bottleEnd', end);
+    _sharedPref!.setStringList('bottle', []);
   }
 }
 

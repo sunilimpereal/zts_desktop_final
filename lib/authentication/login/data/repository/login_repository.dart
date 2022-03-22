@@ -17,7 +17,7 @@ class LoginRepository {
     'Authorization': 'Bearer ${sharedPref.token}',
   };
       LoginRequest loginRequest = LoginRequest(email: email, password: password);
-      final response = await API.post(url: 'login/', body: loginRequest.toJson(), context: context,headers: postheaders);
+      final response = await API.post(url: 'login/', body: loginRequest.toJson(), context: context,headers: postheaders,logs: true);
       if (response.statusCode == 200) {
         LoginResponse loginResponse = loginResponseFromJson(response.body);
         sharedPrefs.setUserDetails(

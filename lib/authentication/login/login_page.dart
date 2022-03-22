@@ -5,6 +5,7 @@ import 'package:zts_counter_desktop/authentication/login/bloc/login_bloc.dart';
 import 'package:zts_counter_desktop/authentication/login/data/repository/login_repository.dart';
 import 'package:zts_counter_desktop/authentication/login/widgets/button.dart';
 import 'package:zts_counter_desktop/authentication/login/widgets/text_field.dart';
+import 'package:zts_counter_desktop/dashboard/settings/screens/settings_login_screen.dart';
 import 'package:zts_counter_desktop/main.dart';
 
 class LoginPage extends StatefulWidget {
@@ -30,18 +31,90 @@ class _LoginPageState extends State<LoginPage> {
     return WinScaffold(
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                'assets/images/background-login.jpg',
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    'assets/images/background-login.jpg',
+                  ),
+                  fit: BoxFit.cover,
+                ),
               ),
-              fit: BoxFit.cover,
+              child: Center(
+                child: logincard(loginBloc),
+              ),
             ),
-          ),
-          child: Center(
-            child: logincard(loginBloc),
-          ),
+            Positioned(
+                bottom: 20,
+                right: 20,
+                child: Material(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  clipBehavior: Clip.hardEdge,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) => SettingsLoginScrteen()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: const [
+                          Icon(
+                            Icons.settings,
+                            size: 24,
+                          ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            'Settings',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                )),
+            Positioned(
+                bottom: 20,
+                left: 20,
+                child: Material(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  clipBehavior: Clip.hardEdge,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) => SettingsLoginScrteen()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: const [
+                          // Icon(
+                          //   Icons.settings,
+                          //   size: 24,
+                          // ),
+                          SizedBox(
+                            width: 8,
+                          ),
+                          Text(
+                            'v 1.3.0.p',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                )),
+          ],
         ),
       ),
     );
@@ -112,6 +185,7 @@ class _LoginPageState extends State<LoginPage> {
                 width: 230,
                 formValidationStream: loginBloc.validateFormStream,
                 submit: () async {
+                  sharedPref.isToday();
                   LoginRepository loginRepository = LoginRepository();
                   loginRepository
                       .login(

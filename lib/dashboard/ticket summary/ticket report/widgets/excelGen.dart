@@ -8,6 +8,7 @@ import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket_report_model.dart';
+import 'package:zts_counter_desktop/main.dart';
 
 import '../../../../utils/methods.dart';
 
@@ -19,7 +20,11 @@ class ExcelGenerator {
 
 //Accessing via index
     final Worksheet sheet = workbook.worksheets[0];
+    final Worksheet btlsheet = workbook.worksheets.add();
+    sheet.name = 'Ticket Report';
+    btlsheet.name = 'Bottle Report';
 
+    // sheet1.getRangeByName('A1').setText('No.');
 // Set the text value.
     sheet.getRangeByName('A1').setText('No.');
     sheet.getRangeByName('B1')
@@ -59,22 +64,22 @@ class ExcelGenerator {
       ..cellStyle.hAlign = HAlignType.center
       ..columnWidth = 20;
     sheet.getRangeByName('K1')
-      ..cellStyle.hAlign = HAlignType.center
-      ..setText('Type')
-      ..cellStyle.hAlign = HAlignType.center
-      ..columnWidth = 18;
-    sheet.getRangeByName('L1')
       ..setText('Quantity')
       ..cellStyle.hAlign = HAlignType.center
       ..columnWidth = 11;
-    sheet.getRangeByName('M1')
+    sheet.getRangeByName('L1')
       ..setText('Price')
       ..cellStyle.hAlign = HAlignType.center
       ..columnWidth = 10;
+    sheet.getRangeByName('M1')
+      ..setText('Fine')
+      ..cellStyle.hAlign = HAlignType.center
+      ..columnWidth = 10;
+
     int ti = 1;
     int i = 2;
     for (TicketReportItem ticketItem in ticketList) {
-      log("message $i");
+      log('message $i');
       sheet.getRangeByName('A$i').setText('${ti}');
       sheet.getRangeByName('B$i').setText('${ticketItem.number}');
       sheet.getRangeByName('C$i').setText('${ticketItem.organizationName}');
@@ -86,24 +91,64 @@ class ExcelGenerator {
           '${DateFormat().add_Hm().addPattern(' ').add_yMEd().format(ticketItem.issuedTs)}');
       sheet.getRangeByName('G$i')
         ..cellStyle.hAlign = HAlignType.center
-        ..setText('${ticketItem.qrCode.isScanned}');
+        ..setText('${ticketItem.qrCode.isScanned ? "Yes" : "No"}');
       sheet.getRangeByName('H$i').setText(
           '${ticketItem.qrCode.isScanned ? DateFormat().add_Hm().addPattern(' ').add_yMEd().format(getCurrentDateTime(ticketItem.qrCode.modifiedTs)) : '-'}');
       for (Lineitem lineItem in ticketItem.lineitems) {
         sheet.getRangeByName('I$i').setText('${lineItem.category}');
-        sheet.getRangeByName('J$i').setText('${lineItem.subcategoryName}');
-        sheet.getRangeByName('K$i').setText('${lineItem.type}');
-        sheet.getRangeByName('L$i')
+        sheet.getRangeByName('J$i').setText('${lineItem.subcategoryName}${lineItem.type}');
+        sheet.getRangeByName('K$i')
           ..cellStyle.hAlign = HAlignType.center
           ..setNumber(lineItem.quantity.toDouble());
-        sheet.getRangeByName('M$i')
+        sheet.getRangeByName('L$i')
           ..cellStyle.hAlign = HAlignType.center
           ..setNumber(lineItem.price);
+        sheet.getRangeByName('M$i')
+          ..cellStyle.hAlign = HAlignType.center
+          ..setNumber(ticketItem.fine.toDouble());
         i++;
       }
       ti++;
     }
     await Future.delayed(Duration(seconds: 0));
+    String getBottleName(String qrCode) {
+      if (qrCode.contains('SCZG')) {
+        return 'MAIN GATE GREEN PAPER';
+      } else if (qrCode.contains('KLNP')) {
+        return 'KARANJI BLACK PAPER';
+      } else if (qrCode.contains('MCZN')) {
+        return 'CANTEEN BLUE WATER PROOF';
+      } else {
+        return "Bottle";
+      }
+    }
+
+    // add bottle Reports
+    btlsheet.getRangeByName('A1').setText('No.');
+    btlsheet.getRangeByName('B1')
+      ..setText('Bottle Qr Code')
+      ..cellStyle.hAlign = HAlignType.center
+      ..columnWidth = 22;
+    btlsheet.getRangeByName('C1')
+      ..setText('Name')
+      ..cellStyle.hAlign = HAlignType.center
+      ..columnWidth = 18;
+    int bi = 2;
+    int bni = 1; //for numbering in excel
+    List<String> bottleList = sharedPref.bottleQrCodes;
+    for (String bottleCode in bottleList) {
+      btlsheet.getRangeByName('A$bi').setText('$bni');
+      btlsheet.getRangeByName('B$bi')
+        ..setText('$bottleCode')
+        ..cellStyle.hAlign = HAlignType.center
+        ..columnWidth = 22;
+      btlsheet.getRangeByName('C$bi')
+        ..setText(getBottleName(bottleCode))
+        ..cellStyle.hAlign = HAlignType.center
+        ..columnWidth = 35;
+      bi++;
+      bni++;
+    }
 
 //Save and launch the excel.
     final List<int> bytes = workbook.saveAsStream();
@@ -128,6 +173,10 @@ class ExcelGenerator {
     }
     return true;
   }
+
+  //bottle
+
+  //bottle
 
   Future<void> generateExcel() async {
     //Create a Excel document.

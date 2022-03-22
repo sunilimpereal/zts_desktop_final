@@ -67,7 +67,7 @@ Future<Uint8List> toQrImageData(String text) async {
 getTicketNumber() {
   DateTime currentDateTime = DateTime.now();
   final parms = [
-    'MYS',
+    sharedPref.getTicketCode,
     sharedPrefs.loginId,
     currentDateTime.month + 1,
     currentDateTime.day,

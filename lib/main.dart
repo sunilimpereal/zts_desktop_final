@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_bloc.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
 import 'package:zts_counter_desktop/authentication/login/login_page.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 // database
 import 'dart:ffi';
@@ -22,7 +23,7 @@ import 'constants/app_fonts.dart';
 
 AppStyles appStyles = AppStyles();
 AppFonts appFonts = AppFonts();
-Config config = Config();
+// Config config = Config();
 SharedPref sharedPref = SharedPref();
 void main() async {
   //database
@@ -36,10 +37,10 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   await sharedPref.init();
-  runApp(const AppWrapperProvider());
+  runApp( Phoenix(child:AppWrapperProvider()));
   doWhenWindowReady(() {
     final win = appWindow;
-    
+
     final initialSize = Size(1920, 1080);
     win.minSize = const Size(800, 600);
     win.size = initialSize;
@@ -92,7 +93,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,  
+      debugShowCheckedModeBanner: false,
       theme: theme,
       title: 'ZTS Counter',
       initialRoute: '/login',

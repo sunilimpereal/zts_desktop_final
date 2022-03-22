@@ -40,12 +40,12 @@ class RecentTicketBloc extends Bloc {
     _recentTicektcontroller.sink.add(result);
   }
 
-  Future<List<TicketReportItem>> getTicketReport({bool? showonlyHour}) async {
+  Future<List<TicketReportItem>> getTicketReport({bool? showonlyHour, DateTime? selcDate , bool? ismonth}) async {
     ticketReportisHour = showonlyHour ?? true;
     TicketRepository ticketRepository = TicketRepository();
     _ticektReportLoadingController.sink.add(true);
     final result = await ticketRepository.getTicketReport(
-        context: context, showonlyHour: showonlyHour ?? true);
+        context: context, showonlyHour: showonlyHour ?? true, seldate: selcDate);
     _ticektReportLoadingController.sink.add(false);
     _ticektReportcontroller.sink.add(result);
     return result;
@@ -54,6 +54,7 @@ class RecentTicketBloc extends Bloc {
   void getLineItemSumry(DateTime date) async {
     TicketRepository ticketRepository = TicketRepository();
     final result = await ticketRepository.getFiletredLineItems(context, date);
+
     selectedDate = date;
     _lineItemSumrycontroller.sink.add(result);
   }

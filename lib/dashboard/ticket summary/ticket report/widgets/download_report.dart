@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket_report_model.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_repository.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/ticket%20report/widgets/excelGen.dart';
 
 import '../../../../main.dart';
@@ -128,8 +129,13 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
   bool loading = false;
   bool excelloading = false;
   bool allUsers = true;
+  bool monthlyReport = false;
   FocusNode userEmailFocus = new FocusNode();
   TextEditingController userEmailTextEditingController = new TextEditingController();
+  FocusNode monthlFocus = new FocusNode();
+  TextEditingController monthController = new TextEditingController();
+  FocusNode yearFocus = new FocusNode();
+  TextEditingController yearController = new TextEditingController();
 
   void _onAllUserChanged(bool? newValue) => setState(() {
         allUsers = newValue ?? false;
@@ -140,11 +146,20 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
           // TODO: Forget the user
         }
       });
+  void _onMonthlyReportChanged(bool? newValue) => setState(() {
+        monthlyReport = newValue ?? false;
 
+        if (allUsers) {
+          // TODO: Here goes your functionality that remembers the user.
+        } else {
+          // TODO: Forget the user
+        }
+      });
   @override
   void initState() {
     selected = options[0];
-
+    monthController.text = DateTime.now().month.toString();
+    yearController.text = DateTime.now().year.toString();
     super.initState();
   }
 
@@ -155,7 +170,15 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
       shadowColor: Colors.white,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.1 * 2,
-        height: MediaQuery.of(context).size.height * 0.2 * (allUsers ? 0.8 : 1),
+        height: MediaQuery.of(context).size.height *
+            0.2 *
+            (allUsers
+                ? monthlyReport
+                    ? 1.5
+                    : 1.2
+                : monthlyReport
+                    ? 1.7
+                    : 1.2),
         color: Colors.white,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,16 +199,16 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 12,
                       ),
                       Row(
                         children: [
-                          Text(
+                          const Text(
                             'Select All Users',
                             style: TextStyle(),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 8,
                           ),
                           Checkbox(
@@ -193,22 +216,22 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
                             onChanged: _onAllUserChanged,
                             activeColor: Colors.green,
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 8,
                           ),
                           Tooltip(
                               message:
-                                  "Downloads Report of all Users.\nUncheck to download report of a single user",
-                              padding: EdgeInsets.all(4),
+                                  'Downloads Report of all Users.\nUncheck to download report of a single user',
+                              padding: const EdgeInsets.all(4),
                               decoration: BoxDecoration(color: Colors.grey[500]),
-                              textStyle: TextStyle(fontSize: 12, color: Colors.white),
-                              child: Icon(
+                              textStyle: const TextStyle(fontSize: 12, color: Colors.white),
+                              child: const Icon(
                                 Icons.info,
                                 size: 18,
                               ))
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 8,
                       ),
                       !allUsers
@@ -272,6 +295,173 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
                               ),
                             )
                           : Container(),
+                      Row(children: [
+                        const Text(
+                          'Monthly Report',
+                          style: TextStyle(),
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                        Checkbox(
+                          value: monthlyReport,
+                          onChanged: _onMonthlyReportChanged,
+                          activeColor: Colors.green,
+                        ),
+                        const SizedBox(
+                          width: 8,
+                        ),
+                      ]),
+                      monthlyReport
+                          ? Material(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.1 * 1.8,
+                                child: Row(
+                                  children: [
+                                    const Text(
+                                      'Year',
+                                      style: TextStyle(),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width * 0.1 * 0.5,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                                        border: Border.all(
+                                            width: 2,
+                                            color: userEmailFocus.hasFocus
+                                                ? Colors.green
+                                                : Colors.transparent),
+                                      ),
+                                      child: Material(
+                                        elevation: userEmailFocus.hasFocus ? 0 : 0,
+                                        color: Theme.of(context).colorScheme.background,
+                                        shape: appStyles.shapeBorder(5),
+                                        shadowColor: Colors.grey[100],
+                                        child: Container(
+                                          //width: MediaQuery.of(context).size.width * 0.7,
+                                          alignment: Alignment.center,
+                                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                                          child: TextFormField(
+                                            controller: yearController,
+                                            focusNode: yearFocus,
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Theme.of(context).textTheme.headline1!.color,
+                                              // AppConfig(context).width<1000?16: 18,
+                                              // fontFamily: appFonts.notoSans,//TODO: fonts
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            onTap: () {},
+                                            onChanged: (value) {},
+                                            keyboardType: TextInputType.emailAddress,
+                                            decoration: InputDecoration(
+                                              // errorText: "${snapshot.error}",
+                                              border: InputBorder.none,
+                                              contentPadding: const EdgeInsets.only(
+                                                  left: 0, right: 10, top: 10, bottom: 10),
+                                              hintText: "${DateTime.now().year}",
+                                              prefixIconConstraints:
+                                                  const BoxConstraints(minWidth: 23, maxHeight: 0),
+
+                                              isDense: true,
+                                              hintStyle: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline1!
+                                                      .color
+                                                      ?.withOpacity(0.5),
+                                                  fontSize: 16),
+
+                                              labelStyle: TextStyle(
+                                                height: 0.6,
+                                                fontSize: 16,
+                                                color: Theme.of(context).textTheme.headline1!.color,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    const Text(
+                                      'Month',
+                                      style: TextStyle(),
+                                    ),
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width * 0.1 * 0.5,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                                        border: Border.all(
+                                            width: 2,
+                                            color: userEmailFocus.hasFocus
+                                                ? Colors.green
+                                                : Colors.transparent),
+                                      ),
+                                      child: Material(
+                                        elevation: userEmailFocus.hasFocus ? 0 : 0,
+                                        color: Theme.of(context).colorScheme.background,
+                                        shape: appStyles.shapeBorder(5),
+                                        shadowColor: Colors.grey[100],
+                                        child: Container(
+                                          //width: MediaQuery.of(context).size.width * 0.7,
+                                          alignment: Alignment.center,
+                                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                                          child: TextFormField(
+                                            controller: monthController,
+                                            focusNode: monthlFocus,
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Theme.of(context).textTheme.headline1!.color,
+                                              // AppConfig(context).width<1000?16: 18,
+                                              // fontFamily: appFonts.notoSans,//TODO: fonts
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            onTap: () {},
+                                            onChanged: (value) {},
+                                            keyboardType: TextInputType.emailAddress,
+                                            decoration: InputDecoration(
+                                              // errorText: "${snapshot.error}",
+                                              border: InputBorder.none,
+                                              contentPadding: const EdgeInsets.only(
+                                                  left: 0, right: 10, top: 10, bottom: 10),
+                                              hintText: "${DateTime.now().month}",
+                                              prefixIconConstraints:
+                                                  const BoxConstraints(minWidth: 23, maxHeight: 0),
+
+                                              isDense: true,
+                                              hintStyle: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .textTheme
+                                                      .headline1!
+                                                      .color
+                                                      ?.withOpacity(0.5),
+                                                  fontSize: 16),
+
+                                              labelStyle: TextStyle(
+                                                height: 0.6,
+                                                fontSize: 16,
+                                                color: Theme.of(context).textTheme.headline1!.color,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ],
@@ -297,29 +487,69 @@ class _ReportDownloadOptionsState extends State<ReportDownloadOptions> {
                               setState(() {
                                 loading = true;
                               });
-                              TicketProvider.of(context)
-                                  .getTicketReport(showonlyHour: false)
-                                  .then((value) async {
-                                setState(() {
-                                  loading = false;
-                                });
-                                List<TicketReportItem> ticketReportList = value;
-                                if (!allUsers) {
-                                  ticketReportList = ticketReportList
-                                      .where((element) =>
-                                          element.userEmail.toLowerCase() ==
-                                          userEmailTextEditingController.text.toLowerCase().trim())
-                                      .toList();
+                              if (monthlyReport) {
+                                try {
+                                  TicketRepository()
+                                      .getMonthTicketReport(
+                                          context: context,
+                                          showonlyHour: false,
+                                          month: int.parse(monthController.text),
+                                          year: int.parse(yearController.text))
+                                      .then((value) async {
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                    List<TicketReportItem> ticketReportList = value;
+                                    if (!allUsers) {
+                                      ticketReportList = ticketReportList
+                                          .where((element) =>
+                                              element.userEmail.toLowerCase() ==
+                                              userEmailTextEditingController.text
+                                                  .toLowerCase()
+                                                  .trim())
+                                          .toList();
+                                    }
+                                    log("asdaa" + value.toString());
+                                    setState(() {
+                                      excelloading = true;
+                                    });
+                                    await ExcelGenerator().createExcel(ticketReportList);
+                                    setState(() {
+                                      excelloading = false;
+                                    });
+                                  });
+                                } catch (e) {
+                                  setState(() {
+                                    excelloading = false;
+                                  });
                                 }
-                                log("asdaa" + value.toString());
-                                setState(() {
-                                  excelloading = true;
+                              } else {
+                                TicketProvider.of(context)
+                                    .getTicketReport(showonlyHour: false)
+                                    .then((value) async {
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  List<TicketReportItem> ticketReportList = value;
+                                  if (!allUsers) {
+                                    ticketReportList = ticketReportList
+                                        .where((element) =>
+                                            element.userEmail.toLowerCase() ==
+                                            userEmailTextEditingController.text
+                                                .toLowerCase()
+                                                .trim())
+                                        .toList();
+                                  }
+                                  log("asdaa" + value.toString());
+                                  setState(() {
+                                    excelloading = true;
+                                  });
+                                  await ExcelGenerator().createExcel(ticketReportList);
+                                  setState(() {
+                                    excelloading = false;
+                                  });
                                 });
-                                await ExcelGenerator().createExcel(ticketReportList);
-                                setState(() {
-                                  excelloading = false;
-                                });
-                              });
+                              }
                             },
                             child: !loading
                                 ? Text(

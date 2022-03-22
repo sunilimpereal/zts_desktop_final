@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:zts_counter_desktop/authentication/login/bloc/login_stream.dart';
+import 'package:zts_counter_desktop/constants/config_.dart';
 import '../main.dart';
 
 class API {
@@ -25,8 +26,8 @@ class API {
      Map<String, String>? headers1,
   }) async {
     try {
-      logs??false?log('url: ${config.API_ROOT + url} '):null;
-      var response = await http.get(Uri.parse(config.API_ROOT + url), headers: headers1??headers);
+      logs??false?log('url: ${Config().API_ROOT + url} '):null;
+      var response = await http.get(Uri.parse(Config().API_ROOT + url), headers: headers1??headers);
       logs??false?log('respose: ${response.statusCode}'):null;
       logs??false?log('respose: ${response.body}'):null;
       if (response.statusCode == 401) {
@@ -46,9 +47,9 @@ class API {
     bool? logs
   }) async {
     try {
-      logs??false?  log('url: ${config.API_ROOT + url} '):null;
+      logs??false?  log('url: ${Config().API_ROOT + url} '):null;
       logs??false? log('body: $body'):null;
-      var response = await http.post(Uri.parse(config.API_ROOT + url),
+      var response = await http.post(Uri.parse(Config().API_ROOT + url),
           body: body, headers: headers ?? postheaders);
       logs??false?log('respose: ${response.statusCode}'):null;
       logs??false?log('respose: ${response.body}'):null;
@@ -68,9 +69,9 @@ class API {
     bool? logs
   }) async {
     try {
-      logs??false?  log('url: ${config.API_ROOT + url} '):null;
+      logs??false?  log('url: ${Config().API_ROOT + url} '):null;
       logs??false? log('body: $body'):null;
-      var response = await http.patch(Uri.parse(config.API_ROOT + url),
+      var response = await http.patch(Uri.parse(Config().API_ROOT + url),
           body: body, headers: headers ?? postheaders);
       logs??false?log('respose: ${response.statusCode}'):null;
       logs??false?log('respose: ${response.body}'):null;

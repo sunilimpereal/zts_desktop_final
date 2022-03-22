@@ -41,8 +41,9 @@ class PdfApi {
     final qrcode = pw.MemoryImage(image);
     final elephantlogo = pw.MemoryImage(
         (await rootBundle.load('assets/images/elephantlogo.png')).buffer.asUint8List());
-    final zootitle =
-        pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
+    // final zootitle =
+    //     pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
+     final zootitle = pw.MemoryImage(File("assets/images/ticket_logo.png").readAsBytesSync());
     final karanji =
         pw.MemoryImage((await rootBundle.load('assets/images/karanji.png')).buffer.asUint8List());
 
@@ -152,18 +153,6 @@ class PdfApi {
       ),
     );
     return saveDocument(name: 'bin.acc', pdf: pdf);
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-
   }
 
   static List<Category> getselectedLineItem(List<CategoryModel> list) {
@@ -318,8 +307,9 @@ class PdfApi {
     final elephantlogo = pw.MemoryImage(
       (await rootBundle.load('assets/images/elephantlogo.png')).buffer.asUint8List(),
     );
-    final zootitle =
-        pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
+      final zootitle = pw.MemoryImage(File("assets/images/ticket_logo.png").readAsBytesSync());
+    // final zootitle =
+    //     pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
     final karanji =
         pw.MemoryImage((await rootBundle.load('assets/images/karanji.png')).buffer.asUint8List());
 
@@ -348,6 +338,7 @@ class PdfApi {
         //
         // ),
         build: (pw.Context context) => [
+              
               pw.Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -384,7 +375,7 @@ class PdfApi {
                         .map((e) => SummaryTableRowDataPDF(
                             name: '${e.subcategory} ${e.type}',
                             qty: e.count,
-                            total: e.count * e.subcategoryPrice))
+                            total: e.lineitemPrice))
                         .toList()),
                     pw.SizedBox(height: 8),
                     pw.Padding(
@@ -426,6 +417,128 @@ class PdfApi {
     return saveDocument(name: 'bin.acc', pdf: pdf);
   }
 
+  static Future<File> parkingsummary(
+      {required List<LineSumryItem> linesItems,
+      required String userEmail,
+      required DateTime dateTime}) async {
+    final pdf = Document();
+    final logo = pw.MemoryImage(
+      (await rootBundle.load('assets/images/logo.png')).buffer.asUint8List(),
+    );
+    final elephantlogo = pw.MemoryImage(
+      (await rootBundle.load('assets/images/elephantlogo.png')).buffer.asUint8List(),
+    );
+      final zootitle = pw.MemoryImage(File("assets/images/ticket_logo.png").readAsBytesSync());
+    // final zootitle =
+    //     pw.MemoryImage((await rootBundle.load('assets/images/zootitle.png')).buffer.asUint8List());
+    final karanji =
+        pw.MemoryImage((await rootBundle.load('assets/images/karanji.png')).buffer.asUint8List());
+
+    double getLength() {
+      double length = 0;
+      for (LineSumryItem lineItem in linesItems) {
+        if ('${lineItem.subcategory} ${lineItem.type}'.length > 15) {
+          length = length + 32;
+        } else {
+          length = length + 25;
+        }
+      }
+      return length;
+    }
+
+    pdf.addPage(MultiPage(
+        pageFormat: PdfPageFormat.roll80.copyWith(
+          height: 300 + 30 + 20 + getLength(),
+          marginTop: 2 * PdfPageFormat.mm,
+          marginLeft: 6 * PdfPageFormat.mm,
+          marginRight: 6 * PdfPageFormat.mm,
+        ),
+        // pageFormat: const PdfPageFormat(
+        //   72 * PdfPageFormat.mm,
+        //   80 * PdfPageFormat.mm,
+        //
+        // ),
+        build: (pw.Context context) => [
+              
+              pw.Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  sharedPrefs.userEmail == 'karanji1@myszoo.com'
+                      ? pw.Container(height: 35, child: pw.Image(karanji))
+                      : pw.Container(height: 35, child: pw.Image(zootitle)),
+                  pw.SizedBox(width: 8),
+                ],
+              ),
+              pw.SizedBox(height: 6),
+              pw.Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceEvenly,
+                  children: [
+                    pw.SizedBox(height: 3),
+                    Pdftext(
+                        text: 'Parking Additional Charges',
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.bold,
+                        heightPadding: 2),
+                    Pdftext(text: 'User : $userEmail', fontSize: 12, heightPadding: 4),
+                    Pdftext(
+                        text: "Summary Date : ${DateFormat('dd/MM/yyyy').format(dateTime)}",
+                        fontSize: 12,
+                        heightPadding: 4),
+                    Pdftext(
+                        text:
+                            "Print Date : ${DateFormat('dd/MM/yyyy hh:mm').format(DateTime.now())}",
+                        fontSize: 12,
+                        heightPadding: 4),
+                    pw.SizedBox(height: 6),
+                    // pw.Column(children: linesItems.map((e) => summarylineItem(e)).toList()),
+                    zooSummaryInvoice(linesItems
+                        .map((e) => SummaryTableRowDataPDF(
+                            name: '${e.subcategory} ${e.type}',
+                            qty: e.count,
+                            total: e.lineitemPrice))
+                        .toList()),
+                    pw.SizedBox(height: 8),
+                    pw.Padding(
+                        padding: const pw.EdgeInsets.only(right: 8),
+                        child: pw.Column(children: [
+                          pw.Container(
+                              width: 200,
+                              height: 35,
+                              decoration: pw.BoxDecoration(
+                                  border: pw.Border.all(width: 0.5, color: PdfColors.black)),
+                              padding: pw.EdgeInsets.all(4),
+                              child: pw.Row(children: [
+                                pw.Text('Agent signature :', style: pw.TextStyle(fontSize: 10))
+                              ])),
+                          pw.Container(
+                              width: 200,
+                              height: 35,
+                              decoration: pw.BoxDecoration(
+                                  border: pw.Border.all(width: 0.5, color: PdfColors.black)),
+                              padding: pw.EdgeInsets.all(4),
+                              child: pw.Row(children: [
+                                pw.Text('Finance signature :', style: pw.TextStyle(fontSize: 10))
+                              ])),
+                        ])),
+                    pw.SizedBox(height: 12),
+                    pw.Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+                          Pdftext(text: 'Powered By '),
+                          pw.SizedBox(height: 3),
+                          pw.Container(height: 32, child: pw.Image(logo)),
+                        ])
+                      ],
+                    ),
+                  ]),
+            ]));
+
+    return saveDocument(name: 'bin.acc', pdf: pdf);
+  }
+
+
   static Widget zooSummaryInvoice(List<SummaryTableRowDataPDF> dataList) {
     double billtotal = 0;
     final data = dataList.map((item) {
@@ -451,11 +564,11 @@ class PdfApi {
         cellHeight: 1,
 
         columnWidths: {
-          0: FlexColumnWidth(5),
-          1: FlexColumnWidth(3),
-          2: FlexColumnWidth(3),
+          0: const FlexColumnWidth(5),
+          1: const FlexColumnWidth(3),
+          2: const FlexColumnWidth(3),
         },
-        cellPadding: pw.EdgeInsets.symmetric(vertical: 4),
+        cellPadding: const pw.EdgeInsets.symmetric(vertical: 4),
         cellAlignments: {
           0: Alignment.centerLeft,
           1: Alignment.center,
@@ -479,6 +592,17 @@ class PdfApi {
     ]);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 class Pdftext extends pw.StatelessWidget {
   String text;

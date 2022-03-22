@@ -61,7 +61,7 @@ class _ZTSStreamButtonState extends State<ZTSStreamButton> {
                             onPressed: snapshot.hasError || !snapshot.hasData
                                 ? () {
                                     setState(() {
-                                      error = 'Fill all Fields to Login';
+                                      error = 'Fill all Fields';
                                     });
                                   }
                                 : () {

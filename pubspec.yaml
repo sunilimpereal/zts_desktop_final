@@ -37,9 +37,12 @@ dependencies:
   http: ^0.13.4
   intl:
   lottie: ^1.0.0
+  flutter_phoenix: ^1.0.0
 
   #svg icons
   flutter_svg: ^0.23.0+1
+  image_picker: ^0.8.4+4
+  filepicker_windows: ^2.0.1
 
   #printing
   pdf: ^3.6.0
@@ -56,6 +59,7 @@ dependencies:
 
   #notification
   advance_notification: ^1.0.5
+
 
 
   

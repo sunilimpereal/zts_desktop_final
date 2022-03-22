@@ -8,6 +8,7 @@ import 'package:zts_counter_desktop/dashboard/counter/counter_dash.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/category.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/repository/category_repository_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/printer/printer_dash.dart';
+import 'package:zts_counter_desktop/dashboard/settings/screens/settings_screen.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/counter/widgets/tab_bar_selector.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/screen/ticket_summary.dart';
@@ -41,6 +42,7 @@ enum Screens {
   counter,
   tickets,
   printer,
+  settings,
 }
 
 class Dashboard extends StatefulWidget {
@@ -103,6 +105,8 @@ class _DashboardState extends State<Dashboard> {
         return ticketScreen(categoryBloc);
       case Screens.printer:
         return printerScreen(categoryBloc);
+      case Screens.settings:
+        return settingsScreen(categoryBloc);
       default:
         return Container();
     }
@@ -130,6 +134,10 @@ class _DashboardState extends State<Dashboard> {
 
   Widget printerScreen(CategoryBloc categoryBloc) {
     return const PrinterDash();
+  }
+
+  Widget settingsScreen(CategoryBloc categoryBloc) {
+    return const SettingsScreen();
   }
 
   Widget topBar() {
@@ -173,6 +181,16 @@ class _DashboardState extends State<Dashboard> {
                           changeScreen(Screens.printer);
                         },
                         selected: selectedScreen == Screens.printer,
+                      )
+                    : Container(),
+                getRole() == 'admin' || getRole() == 'manager'
+                    ? TabBarSelector(
+                        title: 'Settings',
+                        width: 130,
+                        ontap: () {
+                          changeScreen(Screens.settings);
+                        },
+                        selected: selectedScreen == Screens.settings,
                       )
                     : Container(),
                 TabBarSelector(

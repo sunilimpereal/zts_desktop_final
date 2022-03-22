@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:zts_counter_desktop/constants/config_.dart';
 
 import '../../../main.dart';
 
@@ -44,7 +45,7 @@ class _SvgIconState extends State<SvgIcon> {
         builder: (context, snapshot) {
           if (!snapshot.hasData) return Container();
           return snapshot.data ?? false
-              ? SvgPicture.network('${config.ICON_ROOT}${widget.path}', color: widget.color,
+              ? SvgPicture.network('${Config().ICON_ROOT}${widget.path}', color: widget.color,
                   placeholderBuilder: (context) {
                   return SvgPicture.asset(
                     'assets/icons/Default.svg',

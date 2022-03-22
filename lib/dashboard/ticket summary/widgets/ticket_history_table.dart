@@ -6,10 +6,13 @@ import 'package:http/http.dart';
 import 'package:printing/printing.dart';
 import 'package:zts_counter_desktop/dashboard/counter/data/models/generated_tickets.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/line_summary_model.dart';
+import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/models/ticket_report_model.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_bloc.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/data/repository/ticket_repository.dart';
 import 'package:zts_counter_desktop/dashboard/ticket%20summary/widgets/date_picker.dart';
 import 'package:zts_counter_desktop/printer/bill_pdf.dart';
+import 'package:zts_counter_desktop/utils/methods.dart';
+import 'package:zts_counter_desktop/utils/shared_pref.dart';
 
 import '../../../main.dart';
 
@@ -44,6 +47,7 @@ class _TicketHistoryTableState extends State<TicketHistoryTable> {
               ZTSDatePicker(
                 onSelectionChanged: (value) {
                   TicketProvider.of(context).getLineItemSumry(value);
+                  TicketProvider.of(context).getTicketReport(showonlyHour: false, selcDate: value);
                 },
               )
             ],
@@ -90,27 +94,127 @@ class _TicketHistoryTableState extends State<TicketHistoryTable> {
                                   })
                             ],
                           ),
-                          StreamBuilder<List<LineSumryItem>>(
-                              stream: TicketProvider.of(context).lineItemSummary,
-                              builder: (context, snapshot) {
-                                return ElevatedButton(
-                                    onPressed: () async {
-                                      final pdfFile = await PdfApi.billSummary(
-                                          dateTime: TicketProvider.of(context).selectedDate,
-                                          linesItems: snapshot.data ?? [],
-                                          userEmail: sharedPref.userEmail);
-                                      final pdf = pdfFile.readAsBytes();
-                                      List<Printer> printerList = await Printing.listPrinters();
-                                      sharedPref.getPrinter.length > 2
-                                          ? await Printing.directPrintPdf(
-                                              printer: printerList.firstWhere((element) =>
-                                                  element.name == sharedPref.getPrinter),
-                                              onLayout: (_) => pdf)
-                                          : await Printing.layoutPdf(onLayout: (_) => pdf);
-                                      //PdfApi.openFile(pdfFile);
-                                    },
-                                    child: const Text('Print Summary'));
-                              })
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    List<LineSumryItem> parkingFineItem = [];
+                                    double getTotal(List<TicketReportItem> ticketReportList) {
+                                      double totalFine = 0;
+                                      for (TicketReportItem item in ticketReportList) {
+                                        log("item : " + item.fine.toString());
+                                        if (item.fine > 0) {
+                                          totalFine = totalFine + item.fine;
+                                        }
+                                      }
+                                      return totalFine;
+                                    }
+
+                                    List<TicketReportItem> ticketReportList =
+                                        await TicketProvider.of(context).getTicketReport(
+                                            showonlyHour: false,
+                                            selcDate: TicketProvider.of(context).selectedDate);
+
+                                    ticketReportList = ticketReportList
+                                        .where((element) => element.fine != 0)
+                                        .toList();
+                                    List<TicketReportItem> completedList = [];
+                                    for (TicketReportItem fineitem in ticketReportList) {
+                                      TicketReportItem selecteditem = fineitem;
+                                      List<TicketReportItem> selecteditemList = [];
+                                      if (!parkingFineItem.map((e) => e.subcategory).toList().contains(
+                                          '${selecteditem.lineitems[0].subcategoryName} ${selecteditem.lineitems[0].type}')) {
+                                        for (TicketReportItem loopfineitem in ticketReportList) {
+                                          if ('${loopfineitem.lineitems[0].subcategoryName} ${loopfineitem.lineitems[0].subcategoryName}' ==
+                                              '${selecteditem.lineitems[0].subcategoryName} ${selecteditem.lineitems[0].subcategoryName}') {
+                                            selecteditemList.add(loopfineitem);
+                                          }
+                                        }
+                                      }
+
+                                     selecteditemList.isNotEmpty? parkingFineItem.add(LineSumryItem(
+                                          type: '',
+                                          subcategory:
+                                              '${selecteditem.lineitems[0].subcategoryName} ${selecteditem.lineitems[0].type}',
+                                          subcategoryPrice: getTotal(selecteditemList),
+                                          category: '',
+                                          count: selecteditemList.length,
+                                          lineitemPrice: getTotal(selecteditemList))):null;
+                                    }
+                                    final pdfFile = await PdfApi.parkingsummary(
+                                        dateTime: TicketProvider.of(context).selectedDate,
+                                        linesItems: parkingFineItem,
+                                        userEmail: sharedPref.userEmail);
+                                    final pdf = pdfFile.readAsBytes();
+                                    List<Printer> printerList = await Printing.listPrinters();
+                                    sharedPref.getPrinter.length > 2
+                                        ? await Printing.directPrintPdf(
+                                            printer: printerList.firstWhere(
+                                                (element) => element.name == sharedPref.getPrinter),
+                                            onLayout: (_) => pdf)
+                                        : await Printing.layoutPdf(onLayout: (_) => pdf);
+                                  },
+                                  child: Text("Parking Add. Charges")),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              StreamBuilder<List<LineSumryItem>>(
+                                  stream: TicketProvider.of(context).lineItemSummary,
+                                  builder: (context, snapshot) {
+                                    return ElevatedButton(
+                                        onPressed: () async {
+                                          double getTotal(List<TicketReportItem> ticketReportList) {
+                                            double totalFine = 0;
+                                            for (TicketReportItem item in ticketReportList) {
+                                              log("item : " + item.fine.toString());
+                                              if (item.fine > 0) {
+                                                totalFine = totalFine + item.fine;
+                                              }
+                                            }
+                                            return totalFine;
+                                          }
+
+                                          List<TicketReportItem> ticketReportList =
+                                              await TicketProvider.of(context).getTicketReport(
+                                                  showonlyHour: false,
+                                                  selcDate:
+                                                      TicketProvider.of(context).selectedDate);
+                                          ticketReportList = ticketReportList
+                                              .where((element) => element.fine != 0)
+                                              .toList();
+
+                                          LineSumryItem lineSumryItem = LineSumryItem(
+                                              type: "",
+                                              subcategory: "Parking Additional Hours",
+                                              subcategoryPrice: getTotal(ticketReportList),
+                                              category: "",
+                                              count: ticketReportList.length,
+                                              lineitemPrice: getTotal(ticketReportList));
+                                          List<LineSumryItem> lineSummaryItems =
+                                              snapshot.data ?? [];
+                                          if (getTotal(ticketReportList) > 0 &&
+                                              getRole() == 'admin') {
+                                            log("added");
+                                            lineSummaryItems.add(lineSumryItem);
+                                          } else {}
+                                          final pdfFile = await PdfApi.billSummary(
+                                              dateTime: TicketProvider.of(context).selectedDate,
+                                              linesItems: lineSummaryItems,
+                                              userEmail: sharedPref.userEmail);
+                                          final pdf = pdfFile.readAsBytes();
+                                          List<Printer> printerList = await Printing.listPrinters();
+                                          sharedPref.getPrinter.length > 2
+                                              ? await Printing.directPrintPdf(
+                                                  printer: printerList.firstWhere((element) =>
+                                                      element.name == sharedPref.getPrinter),
+                                                  onLayout: (_) => pdf)
+                                              : await Printing.layoutPdf(onLayout: (_) => pdf);
+                                          //PdfApi.openFile(pdfFile);
+                                        },
+                                        child: const Text('Print Summary'));
+                                  })
+                            ],
+                          ),
                         ],
                       ),
                     )

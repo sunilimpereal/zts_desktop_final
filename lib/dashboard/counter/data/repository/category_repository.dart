@@ -93,16 +93,45 @@ class CategoryRepository {
     //PdfApi.openFile(pdfFile.renameSync('$path/${ticket.number}.pdf'));
   }
 
+  // Future<bool> bottleScan({required BuildContext context, required String barcode}) async {
+  //   final response = await API.patch(
+  //       url: 'bottle-qr-code/$barcode/',
+  //       context: context,
+  //       body: '{"is_scanned": true}',
+  //       logs: true);
+  //   if (response.statusCode == 200) {
+  //     if(sharedPref.isToday()){
+  //       sharedPref.addBottletoList(barcode);
+  //     }
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+
+  // }
   Future<bool> bottleScan({required BuildContext context, required String barcode}) async {
-    final response = await API.patch(
-        url: 'bottle-qr-code/$barcode/',
-        context: context,
-        body: '{"is_scanned": true}',
-        logs: true);
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
+    int number = int.parse(numSeperator(barcode)[0]);
+    String code = numSeperator(barcode)[1];
+    int start = int.parse(sharedPrefs.getbottleStart);
+    int end = int.parse(sharedPrefs.getbottleEnd);
+    if (number <= end &&
+        number >= start &&
+        code == sharedPrefs.getbottleCode &&
+        !sharedPrefs.bottleQrCodes.contains(barcode)) {
+      if (sharedPref.isToday()) {
+        sharedPref.addBottletoList(barcode);
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+List<String> numSeperator(String input) {
+  for (int i = 0; i < input.length; i++) {
+    if (int.tryParse(input[i]) != null) {
+      return [input.substring(i), input.substring(0, i)];
     }
   }
+  return ['0', '0'];
 }
